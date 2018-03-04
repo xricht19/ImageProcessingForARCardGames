@@ -3,22 +3,40 @@
 namespace IDAP
 {
 
-	PlayerAreaChangeDetector::PlayerAreaChangeDetector()
+	PlayerAreaActiveDetector::PlayerAreaActiveDetector(int _playerID, int _areaX, int _areaY, int _width, int _height)
 	{
+		// set instance
+		roi = cv::Rect(_areaX, _areaY, _width, _height);
+		playerID = _playerID;
+
+		// prepare background subtraction
 		backSub = cv::createBackgroundSubtractorMOG2();
-		initState = true;
+		initState = false;
 	}
 
 
-	PlayerAreaChangeDetector::~PlayerAreaChangeDetector()
+	PlayerAreaActiveDetector::~PlayerAreaActiveDetector()
 	{
+		backSub.release();
 	}
 
-	bool PlayerAreaChangeDetector::isHandDetected(cv::Mat area)
+	bool PlayerAreaActiveDetector::isAreaActive(cv::Mat currentFrame)
 	{
+		// cut area from currenFrame
+		cv::Mat area = currentFrame(roi);
+
 		// remove background using openCV BackgroundSubstractorMOG2
-		cv::Mat fgmask;
 		backSub->apply(area, fgmask);
+
+		double m = cv::sum(fgmask)[0];
+		double s = fgmask.rows*fgmask.cols;
+
+		/*cv::Size siz(400, 400);
+		cv::Mat temp;
+		cv::resize(fgmask, temp, siz);
+		cv::imshow("fgmask", temp);*/
+
+		//std::cout << s << "||" << m << std::endl;
 
 		double value = cv::sum(fgmask)[0] / (fgmask.rows*fgmask.cols);
 

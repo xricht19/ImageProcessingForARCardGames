@@ -22,8 +22,8 @@ namespace IDAP
 		instance->GetNumberOfAllAvailableDevices(errorCode, numberOfDevices);
 	}
 
-	void InitImageDetectionAccessPointCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& cameraId, const char* path) {
-		instance->InitImageDetectionAccessPoint(errorCode, cameraId, path);
+	void InitImageDetectionAccessPointCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& cameraId, const char* path, int tableID) {
+		instance->InitImageDetectionAccessPoint(errorCode, cameraId, path, tableID);
 	}
 
 	void InitImageDetectionAccessPointROSCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uchar* ipAdress, uint16_t& port, const char* path) {
@@ -42,8 +42,8 @@ namespace IDAP
 		instance->GetCurrentFrameData(errorCode, rows, columns, channels, dataBytes);
 	}
 
-	void IsPlayerActiveByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& playerID) {
-		instance->IsPlayerActiveByID(errorCode, playerID);
+	void IsPlayerActiveByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& playerID, uint16_t &isActive) {
+		instance->IsPlayerActiveByID(errorCode, playerID, isActive);
 	}
 
 	void HasGameObjectChangedCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& positionID, uint16_t& objectID) {

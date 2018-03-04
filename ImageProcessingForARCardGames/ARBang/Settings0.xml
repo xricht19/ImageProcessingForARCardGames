@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone = "yes"?>
 <ARBang>
-	<ARBangTableSettings>
-		<CentralArea start_x="40" start_y="70" end_x="60" end_y="100" />
+	<ARBangTableSettings id="0">
+		<CentralArea start_x="40" start_y="70" width="60" height="100" />
 		<Players numberOf="4">
-			<Player id="0">
-				<ActiveArea start_x="0" start_y="0" end_x="20" end_y="20" />
+			<Player id="1">
+				<ActiveArea start_x="0" start_y="0" width="20" height="20" />
+			</Player>
+			<Player id="2">
+				<ActiveArea start_x="0" start_y="20" width="20" height="20" />
+			</Player>
+			<Player id="3">
+				<ActiveArea start_x=" 80" start_y="0" width="20" height="20" />
+			</Player>
+			<Player id="4">
+				<ActiveArea start_x=" 80" start_y="20" width="20" height="20" />
 			</Player>
 		</Players>
 		<CardsPosition>

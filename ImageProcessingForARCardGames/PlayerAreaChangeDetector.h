@@ -3,28 +3,31 @@
 #include <opencv2\core\core.hpp>
 #include <opencv2\highgui\highgui.hpp>
 #include <opencv2\opencv.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2\imgproc\imgproc.hpp>
+
 
 // number of frames before the hand of player is again detected
-#define NUMBER_OF_FRAMES_DISTANCE_FROM_LAST_DETECTION 10
 #define LOWER_THRESHOLD 40
 #define UPPER_THRESHOLD 90
 
 namespace IDAP
 {
-	class PlayerAreaChangeDetector
+	class PlayerAreaActiveDetector
 	{
 	public:
-		PlayerAreaChangeDetector();
-		~PlayerAreaChangeDetector();
+		PlayerAreaActiveDetector(int _playerID, int _areaX, int _areaY, int _width, int _height);
+		~PlayerAreaActiveDetector();
 
-		bool isHandDetected(cv::Mat area);
+		bool isAreaActive(cv::Mat currentFrame);
 
 	private:
-		int areaID;
+		int playerID;
 		cv::Ptr<cv::BackgroundSubtractorMOG2> backSub;
 		int lastFrameDetected;
 		bool initState;
+		// info about players area
+		cv::Rect roi;
+		cv::Mat fgmask;
 	};
 
 }
