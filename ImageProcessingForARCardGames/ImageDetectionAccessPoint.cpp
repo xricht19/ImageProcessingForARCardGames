@@ -118,6 +118,18 @@ namespace IDAP
 		}
 	}
 
+	void ImageDetectionAccessPoint::initCardAreaDetectors()
+	{
+		// go over all card position and check if changed
+		for (std::vector<CardPosition*>::iterator it = cardPositions.begin(); it != cardPositions.end(); ++it)
+		{
+			CardPosition* cPos = *it;
+			CardAreaDetection* newDetector = new CardAreaDetection();
+
+			cardAreaDetectors.insert(std::pair<int, CardAreaDetection*>(cPos->getID(), newDetector));
+		}
+	}
+
 
 	int ImageDetectionAccessPoint::getNumberOfPlayers()
 	{
@@ -271,6 +283,8 @@ namespace IDAP
 		}
 		// prepare active area detector for every player
 		initPlayerActiveAreaDetectors();
+		// prepare card change detectors
+		initCardAreaDetectors();
 
 		this->usingROS = false;
 

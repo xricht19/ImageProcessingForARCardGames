@@ -33,8 +33,9 @@ int main() {
 			{
 				std::cout << "Player: " << i << " is ACTIVE!" << std::endl;
 			}
-			// TO-DO: CHECK IF CARD HAS CHANGED
 		}
+		// TO-DO: CHECK IF CARD HAS CHANGED
+		//for (uint16_t i=0; i< (uint16_t))
  		char pressed = cv::waitKey(1);
 		std::cout << pressed << std::endl;
 		if (pressed == 'q')

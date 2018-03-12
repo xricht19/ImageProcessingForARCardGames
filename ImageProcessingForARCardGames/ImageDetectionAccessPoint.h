@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "PlayerAreaChangeDetector.h"
+#include "CardAreaDetection.h"
 
 #include "rapidxml-1.13\rapidxml.hpp"
 #include "rapidxml-1.13\rapidxml_utils.hpp"
@@ -80,6 +81,7 @@ namespace IDAP
 		cv::Mat frame;
 		cv::Mat subSampledFrame; // frame in size 100 x 100
 		std::map<int, PlayerAreaActiveDetector*> isPlayerActiveDetectors;
+		std::map<int, CardAreaDetection*> cardAreaDetectors;
 
 		// loaded settings
 		int numberOfPlayers;
@@ -110,6 +112,8 @@ namespace IDAP
 		
 		// set active area detectors
 		void initPlayerActiveAreaDetectors();		
+		// set card area detectors
+		void initCardAreaDetectors();
 
 	public:
 		ImageDetectionAccessPoint();
