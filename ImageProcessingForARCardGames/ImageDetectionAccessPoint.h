@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 #include <opencv2\core.hpp>
 #include <opencv2\highgui.hpp>
 #include <vector>
@@ -9,8 +10,6 @@
 
 #include "rapidxml-1.13\rapidxml.hpp"
 #include "rapidxml-1.13\rapidxml_utils.hpp"
-
-
 
 
 namespace IDAP
