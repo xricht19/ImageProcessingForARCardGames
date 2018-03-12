@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CardAreaDetection.h" />
     <ClInclude Include="PlayerAreaChangeDetector.h" />
     <ClInclude Include="ImageDetectionAccessPoint.h" />
     <ClInclude Include="VideoCaptureInterfaceCaller.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CardAreaDetection.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayerAreaChangeDetector.cpp" />
     <ClCompile Include="ImageDetectionAccessPoint.cpp" />

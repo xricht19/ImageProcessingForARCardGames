@@ -24,6 +24,9 @@
     <ClInclude Include="ImageDetectionAccessPoint.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
+    <ClInclude Include="CardAreaDetection.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VideoCaptureInterfaceCaller.cpp">
@@ -36,6 +39,9 @@
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="CardAreaDetection.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
   </ItemGroup>
