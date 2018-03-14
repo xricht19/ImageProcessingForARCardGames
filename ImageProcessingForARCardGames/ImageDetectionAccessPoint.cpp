@@ -2,6 +2,18 @@
 
 namespace IDAP
 {
+	void ImageDetectionAccessPoint::LoadCardData(std::string path)
+	{
+		// list all files in given folder and load them to memory and provide them to card area detection for template matching
+		for (auto &file : std::experimental::filesystem::directory_iterator(path))
+		{
+			cv::Mat img = cv::imread(file.path().string().c_str(), CV_LOAD_IMAGE_COLOR);
+			// TO-DO: PERFORM SUBSAMPLING, MAYBE SAVE SUBSAMPLED (MAYBE ONLY GREYSCALE) TO NEW FOLDER AND LOOK FOR IT ON LOADING,
+			//		  WE DO NOT HAVE TO LOAD LARGE IMAGES AND SUBSAMPLE THEM WHENEVER THE APP IS STARTED
+			gameCardData.insert(std::make_pair(file.path().string(), img));
+		}
+	}
+
 	// private function area ------------------------------------------------------------------
 	// --------- SETTINGS ---------------------------------------------------------------------
 	void ImageDetectionAccessPoint::loadSettingsFromXml(const char* path, int tableID)
@@ -124,14 +136,26 @@ namespace IDAP
 		for (std::vector<CardPosition*>::iterator it = cardPositions.begin(); it != cardPositions.end(); ++it)
 		{
 			CardPosition* cPos = *it;
-			CardAreaDetection* newDetector = new CardAreaDetection();
+			CardSize* cSize = getCardSizeByID(cPos->getCardSizeID());
+			CardAreaDetection* newDetector = new CardAreaDetection(cPos->getID(), cPos->getPlayerID(), cPos->getCardSizeID(),
+			                                                       cPos->getLeftTopX(), cPos->getLeftTopY(), cSize->getWidth(), cSize->getHeight());
 
 			cardAreaDetectors.insert(std::pair<int, CardAreaDetection*>(cPos->getID(), newDetector));
 		}
 	}
 
+	CardSize* ImageDetectionAccessPoint::getCardSizeByID(int id)
+	{
+		for (auto &item : cardTypes)
+		{
+			if (item->getID() == id)
+				return item;
+		}
+		return nullptr;
+	}
 
-	int ImageDetectionAccessPoint::getNumberOfPlayers()
+
+	uint16_t ImageDetectionAccessPoint::GetNumberOfPlayers()
 	{
 		return numberOfPlayers;
 	}
@@ -171,6 +195,13 @@ namespace IDAP
 		}
 		// free std::map<int, PlayerAreaActiveDetector> isPlayerActiveDetectors;
 		for (std::map<int, PlayerAreaActiveDetector*>::iterator it = isPlayerActiveDetectors.begin(); it != isPlayerActiveDetectors.end(); it++) {
+			if (it->second != NULL) {
+				delete(it->second);
+				it->second = NULL;
+			}
+		}
+		// free std::map<int, CardAreaDetection*> cardAreaDetectors;
+		for (std::map<int, CardAreaDetection*>::iterator it = cardAreaDetectors.begin(); it != cardAreaDetectors.end(); it++) {
 			if (it->second != NULL) {
 				delete(it->second);
 				it->second = NULL;
@@ -252,9 +283,25 @@ namespace IDAP
 		isActive = 0;
 	}
 
-	void ImageDetectionAccessPoint::HasGameObjectChanged(uint16_t &errorCode, uint16_t &positionID, uint16_t &objectID)
+	/**
+	 * \brief Go through all card positions and check if change occure.
+	 * @param cardID Sent by reference, contain the card id found in roi for the given ID.
+	 */
+	void ImageDetectionAccessPoint::IsCardChangedByID(uint16_t& errorCode, uint16_t&ID, uint16_t&cardID)
 	{
+		cardID = cardAreaDetectors[ID]->isCardChanged(frame);
 	}
+
+	std::map<std::string, cv::Mat>* ImageDetectionAccessPoint::GetGameCardData()
+	{
+		return &gameCardData;
+	}
+
+	uint16_t ImageDetectionAccessPoint::GetNumberOfCardAreas()
+	{
+		return static_cast<uint16_t>(cardPositions.size());
+	}
+
 
 	void ImageDetectionAccessPoint::GetNumberOfAllAvailableDevices(uint16_t &errorCode, uint16_t &numOfDevices)
 	{

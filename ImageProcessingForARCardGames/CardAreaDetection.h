@@ -2,31 +2,41 @@
 
 #include <cstdint>
 #include <vector>
+#include <iostream>
 #include <opencv2\core.hpp>
 #include <opencv2\highgui.hpp>
 
-class CardAreaDetection
+#define CARD_DATA_SUBSAMPLING_RATE 0.2
+
+
+namespace IDAP
 {
-public:
-	CardAreaDetection();
-	~CardAreaDetection();
+	class CardAreaDetection
+	{
+	public:
+		CardAreaDetection(int _id, int _playerID, int _sizeID, int _xPos, int _yPos, int _width, int _height);
+		~CardAreaDetection();
 
-	uint16_t isCardChanged(); // core function with template matching function
+		uint16_t isCardChanged(cv::Mat currentFrame); // core function with template matching function
 
-private:
-	// firstly, the card in roi has to be settle up
-	cv::Mat settleUpRoi();
-	// load cards data
-	void loadCardData(std::string); // path to folder with data required
-	
-	int id;
-	int playerID;
-	int cardID;
-	bool initState;
+	private:
+		// firstly, the card in roi has to be settle up
+		cv::Mat settleUpRoi();
+		
+		// data from previous frame
+		cv::Mat previousFrameData;
 
-	// the position where the card in image is
-	cv::Rect roi;
-	// card data for template matching
-	std::vector<std::pair<int, cv::Mat>> cardData;
-};
+		int id;
+		int playerID;
+		int sizeID;
+		int posX;
+		int posY;
+
+		int cardID;
+		bool initState;
+
+		// the position where the card in image is
+		cv::Rect roi;
+	};
+}
 

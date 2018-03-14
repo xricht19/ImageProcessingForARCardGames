@@ -47,6 +47,6 @@ namespace IDAP
 	}
 
 	void HasGameObjectChangedCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& positionID, uint16_t& objectID) {
-		instance->HasGameObjectChanged(errorCode, positionID, objectID);
+		instance->IsCardChangedByID(errorCode, positionID, objectID);
 	}
 }

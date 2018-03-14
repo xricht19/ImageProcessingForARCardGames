@@ -5,6 +5,7 @@
 #include <opencv2\core.hpp>
 #include <opencv2\highgui.hpp>
 #include <vector>
+#include <filesystem>
 
 #include "PlayerAreaChangeDetector.h"
 #include "CardAreaDetection.h"
@@ -89,6 +90,9 @@ namespace IDAP
 		std::vector<CardPosition*> cardPositions;
 		std::vector<PlayerInfo*> playersInfo;
 
+		// loaded card data for matching
+		std::map<std::string, cv::Mat> gameCardData;
+
 		int centralAreaX;
 		int centralAreaY;
 		int centralAreaWidth;
@@ -105,6 +109,10 @@ namespace IDAP
 			FRAME_WAS_NOT_READ,
 			CANNOT_LOAD_SETTINGS_FROM_XML,
 		};
+
+		// card data for template matching
+		std::vector<std::pair<int, cv::Mat>> cardData;
+
 		// additional function to load settings from xml
 		void loadSettingsFromXml(const char*, int);
 		rapidxml::xml_node<>* getTableSettingNodeByID(int ID, rapidxml::xml_node<>* rootNode);
@@ -115,6 +123,8 @@ namespace IDAP
 		// set card area detectors
 		void initCardAreaDetectors();
 
+		CardSize* getCardSizeByID(int id);
+
 	public:
 		ImageDetectionAccessPoint();
 		~ImageDetectionAccessPoint();
@@ -124,15 +134,21 @@ namespace IDAP
 		void InitImageDetectionAccessPoint(uint16_t&, uint16_t&, const char*, int);
 		void InitImageDetectionAccessPointROS(uint16_t&, uchar*, uint16_t&, const char*&);
 		void GetVideoResolution(uint16_t&, uint16_t&, uint16_t&);
+		// load cards data
+		void LoadCardData(std::string); // path to folder with data required
 
 		void PrepareNextFrame(uint16_t&);
 		void GetCurrentFrameData(uint16_t&, uint16_t&, uint16_t&, uint16_t&, uchar*&);
 		void IsPlayerActiveByID(uint16_t&, uint16_t&, uint16_t&);
-		void HasGameObjectChanged(uint16_t&, uint16_t&, uint16_t&);
+		void IsCardChangedByID(uint16_t&, uint16_t&, uint16_t&);
+
+		std::map<std::string, cv::Mat>* GetGameCardData();
+		uint16_t GetNumberOfCardAreas();
+		uint16_t GetNumberOfPlayers();
 
 		int errorCode;
 
-		int getNumberOfPlayers();
+		
 		cv::Mat getFrame();
 		cv::Mat getSubSampledFrame();
 

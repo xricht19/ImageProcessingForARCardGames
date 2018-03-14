@@ -28,16 +28,6 @@ namespace IDAP
 		// remove background using openCV BackgroundSubstractorMOG2
 		backSub->apply(area, fgmask);
 
-		double m = cv::sum(fgmask)[0];
-		double s = fgmask.rows*fgmask.cols;
-
-		/*cv::Size siz(400, 400);
-		cv::Mat temp;
-		cv::resize(fgmask, temp, siz);
-		cv::imshow("fgmask", temp);*/
-
-		//std::cout << s << "||" << m << std::endl;
-
 		double value = cv::sum(fgmask)[0] / (fgmask.rows*fgmask.cols);
 
 		// check if the value is high enough and if it already drop down from last time
