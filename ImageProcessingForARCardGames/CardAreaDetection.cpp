@@ -27,3 +27,4 @@ uint16_t IDAP::CardAreaDetection::isCardChanged(cv::Mat currentFrame)
 	std::cout << "Matching card." << std::endl;
 	return 1;
 }
+

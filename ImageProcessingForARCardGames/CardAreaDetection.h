@@ -20,8 +20,6 @@ namespace IDAP
 		uint16_t isCardChanged(cv::Mat currentFrame); // core function with template matching function
 
 	private:
-		// firstly, the card in roi has to be settle up
-		cv::Mat settleUpRoi();
 		
 		// data from previous frame
 		cv::Mat previousFrameData;

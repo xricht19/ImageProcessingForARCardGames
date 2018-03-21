@@ -19,6 +19,7 @@ namespace IDAP
 		extern DllExport void PrepareNextFrameCaller(ImageDetectionAccessPoint*, uint16_t&);
 		extern DllExport void GetCurrentFrameDataCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, uint16_t&, uint16_t&, uchar*&);
 		extern DllExport void IsPlayerActiveByIDCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, uint16_t&);
-		extern DllExport void HasGameObjectChangedCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, uint16_t&);
+		extern DllExport void IsCardChangedByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& positionID, uint16_t& cardID);
+
 	}
 }

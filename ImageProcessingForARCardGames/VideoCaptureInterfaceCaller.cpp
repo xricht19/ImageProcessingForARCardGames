@@ -46,7 +46,7 @@ namespace IDAP
 		instance->IsPlayerActiveByID(errorCode, playerID, isActive);
 	}
 
-	void HasGameObjectChangedCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& positionID, uint16_t& objectID) {
-		instance->IsCardChangedByID(errorCode, positionID, objectID);
+	void IsCardChangedByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& positionID, uint16_t& cardID) {
+		instance->IsCardChangedByID(errorCode, positionID, cardID);
 	}
 }
