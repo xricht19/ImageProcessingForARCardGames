@@ -12,7 +12,8 @@ namespace IDAP
 		extern DllExport void DestroyImageDetectionAccessPoint(ImageDetectionAccessPoint*);
 
 		extern DllExport void GetNumberOfAllAvailableDevicesCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&);
-		extern DllExport void InitImageDetectionAccessPointCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, const char*, int);
+		extern DllExport void InitImageDetectionAccessPointCameraCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&);
+        extern DllExport void InitImageDetectionAccessPointDataCaller(ImageDetectionAccessPoint*, uint16_t&, const char*, int);
 		extern DllExport void InitImageDetectionAccessPointROSCaller(ImageDetectionAccessPoint*, uint16_t&, uchar*, uint16_t&, const char*);
 		extern DllExport void GetVideoResolutionCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, uint16_t&);
 

@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CameraCalibration.h" />
     <ClInclude Include="CardAreaDetection.h" />
     <ClInclude Include="PlayerAreaChangeDetector.h" />
     <ClInclude Include="ImageDetectionAccessPoint.h" />
     <ClInclude Include="VideoCaptureInterfaceCaller.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CameraCalibration.cpp" />
     <ClCompile Include="CardAreaDetection.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayerAreaChangeDetector.cpp" />
@@ -106,7 +108,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world330.lib;opencv_world330d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world330d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -140,7 +142,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world330.lib;opencv_world330d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world330.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

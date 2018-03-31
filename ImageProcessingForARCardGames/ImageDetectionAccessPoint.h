@@ -9,6 +9,7 @@
 
 #include "PlayerAreaChangeDetector.h"
 #include "CardAreaDetection.h"
+#include "CameraCalibration.h"
 
 #include "rapidxml-1.13\rapidxml.hpp"
 #include "rapidxml-1.13\rapidxml_utils.hpp"
@@ -100,16 +101,6 @@ namespace IDAP
 
 		bool usingROS = false;
 
-		enum ErrorCodes {
-			OK = 0,
-			CANNOT_OPEN_VIDEO_STREAM,
-			VIDEO_STREAM_IS_NOT_OPENED,
-			CANNOT_GET_IMAGE_FROM_CAMERA,
-			CONNECTION_TO_ROS_IS_AVAILABLE_ONLY_ON_WINDOWS,
-			FRAME_WAS_NOT_READ,
-			CANNOT_LOAD_SETTINGS_FROM_XML,
-		};
-
 		// card data for template matching
 		std::vector<std::pair<int, cv::Mat>> cardData;
 
@@ -125,13 +116,28 @@ namespace IDAP
 
 		CardSize* getCardSizeByID(int id);
 
+        // camera calibration variables
+        CameraCalibration* _cameraCalib;
+
 	public:
 		ImageDetectionAccessPoint();
 		~ImageDetectionAccessPoint();
 
-		void GetNumberOfAllAvailableDevices(uint16_t&, uint16_t&);
+        enum ErrorCodes {
+            OK = 0,
+            CANNOT_OPEN_VIDEO_STREAM,
+            VIDEO_STREAM_IS_NOT_OPENED,
+            CANNOT_GET_IMAGE_FROM_CAMERA,
+            CONNECTION_TO_ROS_IS_AVAILABLE_ONLY_ON_WINDOWS,
+            FRAME_WAS_NOT_READ,
+            CANNOT_LOAD_SETTINGS_FROM_XML,
+        };
 
-		void InitImageDetectionAccessPoint(uint16_t&, uint16_t&, const char*, int);
+		static void GetNumberOfAllAvailableDevices(uint16_t&, uint16_t&);
+        static void IDAPPrintError(uint16_t errorCode, std::string data = "");
+
+		void InitImageDetectionAccessPointCamera(uint16_t&, uint16_t&);
+        void InitImageDetectionAccessPointData(uint16_t&, const char*, int);
 		void InitImageDetectionAccessPointROS(uint16_t&, uchar*, uint16_t&, const char*&);
 		void GetVideoResolution(uint16_t&, uint16_t&, uint16_t&);
 		// load cards data
@@ -154,5 +160,8 @@ namespace IDAP
 
 		// free everything created on heap
 		void freeSettings();
+
+        // camera calibration access
+        CameraCalibration* GetCalibration() const { return _cameraCalib; }
 	};
 }

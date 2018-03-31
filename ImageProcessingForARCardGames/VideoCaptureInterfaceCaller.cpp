@@ -19,12 +19,16 @@ namespace IDAP
 	// returns number of camera devices connected to computer
 
 	void GetNumberOfAllAvailableDevicesCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& numberOfDevices) {
-		instance->GetNumberOfAllAvailableDevices(errorCode, numberOfDevices);
+		ImageDetectionAccessPoint::GetNumberOfAllAvailableDevices(errorCode, numberOfDevices);
 	}
 
-	void InitImageDetectionAccessPointCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& cameraId, const char* path, int tableID) {
-		instance->InitImageDetectionAccessPoint(errorCode, cameraId, path, tableID);
+	void InitImageDetectionAccessPointCameraCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& cameraId) {
+		instance->InitImageDetectionAccessPointCamera(errorCode, cameraId);
 	}
+
+    void InitImageDetectionAccessPointDataaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, const char* path, int tableID) {
+        instance->InitImageDetectionAccessPointData(errorCode, path, tableID);
+    }
 
 	void InitImageDetectionAccessPointROSCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uchar* ipAdress, uint16_t& port, const char* path) {
 		instance->InitImageDetectionAccessPointROS(errorCode, ipAdress, port, path);
