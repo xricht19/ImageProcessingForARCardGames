@@ -144,7 +144,8 @@ namespace IDAP
 		void LoadCardData(std::string); // path to folder with data required
 
 		void PrepareNextFrame(uint16_t&);
-		void GetCurrentFrameData(uint16_t&, uint16_t&, uint16_t&, uint16_t&, uchar*&);
+		void GetCurrentFrameSize(uint16_t&, uint16_t&, uint16_t&, uint16_t&);
+		void GetCurrentFrameData(uint16_t&, uint16_t&, uint16_t&, uint16_t&, uchar*);
 		void IsPlayerActiveByID(uint16_t&, uint16_t&, uint16_t&);
 		void IsCardChangedByID(uint16_t&, uint16_t&, uint16_t&);
 

@@ -26,7 +26,7 @@ namespace IDAP
 		instance->InitImageDetectionAccessPointCamera(errorCode, cameraId);
 	}
 
-    void InitImageDetectionAccessPointDataaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, const char* path, int tableID) {
+    void InitImageDetectionAccessPointDataCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, const char* path, uint16_t tableID) {
         instance->InitImageDetectionAccessPointData(errorCode, path, tableID);
     }
 
@@ -42,7 +42,11 @@ namespace IDAP
 		instance->PrepareNextFrame(errorCode);
 	}
 
-	void GetCurrentFrameDataCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& rows, uint16_t& columns, uint16_t& channels, uchar*& dataBytes) {
+	void GetCurrentFrameSizeCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& rows, uint16_t& columns, uint16_t& channels) {
+		instance->GetCurrentFrameSize(errorCode, rows, columns, channels);
+	}
+
+	void GetCurrentFrameDataCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& rows, uint16_t& columns, uint16_t& channels, uchar* dataBytes) {
 		instance->GetCurrentFrameData(errorCode, rows, columns, channels, dataBytes);
 	}
 

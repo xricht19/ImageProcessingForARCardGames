@@ -261,7 +261,7 @@ namespace IDAP
 
 	}
 
-	void ImageDetectionAccessPoint::GetCurrentFrameData(uint16_t &errorCode, uint16_t &rows, uint16_t &columns, uint16_t &channels, uchar* &dataBytes)
+	void ImageDetectionAccessPoint::GetCurrentFrameSize(uint16_t &errorCode, uint16_t &rows, uint16_t &columns, uint16_t &channels)
 	{
 		if (!openedStream.isOpened() && !usingROS) {
 			errorCode = ErrorCodes::VIDEO_STREAM_IS_NOT_OPENED;
@@ -273,7 +273,24 @@ namespace IDAP
 			rows = (uint16_t)frame.rows;
 			columns = (uint16_t)frame.cols;
 			channels = (uint16_t)frame.channels();
-			dataBytes = frame.data;
+		}
+	}
+
+	void ImageDetectionAccessPoint::GetCurrentFrameData(uint16_t &errorCode, uint16_t &rows, uint16_t &columns, uint16_t &channels, uchar* dataBytes)
+	{
+		if (!openedStream.isOpened() && !usingROS) {
+			errorCode = ErrorCodes::VIDEO_STREAM_IS_NOT_OPENED;
+		}
+		else if (frame.empty()) {
+			errorCode = ErrorCodes::FRAME_WAS_NOT_READ;
+		}
+		else {
+			rows = (uint16_t)frame.rows;
+			columns = (uint16_t)frame.cols;
+			channels = (uint16_t)frame.channels();
+			//unsigned char *buffer = new unsigned char[rows*columns*channels];
+			std::memcpy(dataBytes, frame.data, rows*columns*channels);
+			//dataBytes = buffer;
 		}
 	}
 
