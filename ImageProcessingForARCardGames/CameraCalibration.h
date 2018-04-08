@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-#define ENOUGH_IMAGES_FOR_CALIB 15
+#define ENOUGH_IMAGES_FOR_CALIB 25
 #define CHESSBOARD_WIDTH 6
 #define CHESSBOARD_HEIGHT 9
 #define CHESSBOARD_SQUARE_SIZE 0.024f

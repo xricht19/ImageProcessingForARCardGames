@@ -63,7 +63,12 @@ int main() {
 	// ------------------------------------- INIT CAMERA ---------------------------------------------
 	std::string path = "ARBang/Settings0.xml";
 	access->InitImageDetectionAccessPointCamera(errorCode, cameraId);
-
+	if (errorCode != IDAP::ImageDetectionAccessPoint::OK)
+	{
+		fprintf(stderr, "Cannot init IDAP!\n");
+		delete(access);
+		exit(1);
+	}
     // ----------------------------------- CAMERA  CALIBRATION ---------------------------------------
     // check if camera calibration file exists, skip calibration in that case
     if (!access->GetCameraCalibration()->LoadCameraCalib(CAMERA_CALIBRATION_FILE))
@@ -71,6 +76,7 @@ int main() {
         cv::namedWindow("CameraCalib");
         uint16_t enoughData = 0;
         access->GetCameraCalibration()->IsEnoughData(enoughData);
+		int timeCounter = 0;
         while (!enoughData)
         {
             // prepare next frame
@@ -82,10 +88,16 @@ int main() {
                 exit(1);
             }
 
-            cv::imshow("CameraCalib", access->getSubSampledFrame());
-            char pressed = cv::waitKey(2000);       // wait two seconds between each insert, to let user move the chessboard
-            access->GetCameraCalibration()->AddImageWithChessboard(access->getFrame());
-            access->GetCameraCalibration()->IsEnoughData(enoughData);
+            cv::imshow("CameraCalib", access->getFrame());
+            char pressed = cv::waitKey(1000/25);       // cca 25 fps
+			if (timeCounter >= 50)
+			{
+				access->GetCameraCalibration()->AddImageWithChessboard(access->getFrame());
+				access->GetCameraCalibration()->IsEnoughData(enoughData);
+				timeCounter = 0;
+			}
+			else
+				timeCounter++;
         }
         cv::destroyWindow("CameraCalib");
         // have enough data, calibrating

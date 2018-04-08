@@ -96,7 +96,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world330.lib;opencv_world330d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_aruco341d.lib;opencv_calib3d341d.lib;opencv_core341d.lib;opencv_dnn341d.lib;opencv_features2d341d.lib;opencv_flann341d.lib;opencv_highgui341d.lib;opencv_imgcodecs341d.lib;opencv_imgproc341d.lib;opencv_ml341d.lib;opencv_objdetect341d.lib;opencv_photo341d.lib;opencv_shape341d.lib;opencv_stitching341d.lib;opencv_superres341d.lib;opencv_video341d.lib;opencv_videoio341d.lib;opencv_videostab341d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,7 +110,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_aruco341d.lib;opencv_calib3d341d.lib;opencv_core341d.lib;opencv_dnn341d.lib;opencv_features2d341d.lib;opencv_flann341d.lib;opencv_highgui341d.lib;opencv_imgcodecs341d.lib;opencv_imgproc341d.lib;opencv_ml341d.lib;opencv_objdetect341d.lib;opencv_photo341d.lib;opencv_shape341d.lib;opencv_stitching341d.lib;opencv_superres341d.lib;opencv_video341d.lib;opencv_videoio341d.lib;opencv_videostab341d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_aruco341d.lib;opencv_calib3d341d.lib;opencv_core341d.lib;opencv_dnn341d.lib;opencv_features2d341d.lib;opencv_flann341d.lib;opencv_highgui341d.lib;opencv_imgcodecs341d.lib;opencv_imgproc341d.lib;opencv_ml341d.lib;opencv_objdetect341d.lib;opencv_photo341d.lib;opencv_shape341d.lib;opencv_stitching341d.lib;opencv_superres341d.lib;opencv_video341d.lib;opencv_videoio341d.lib;opencv_videostab341d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -126,7 +126,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world330.lib;opencv_world330d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_aruco341.lib;opencv_calib3d341.lib;opencv_core341.lib;opencv_dnn341.lib;opencv_features2d341.lib;opencv_flann341.lib;opencv_highgui341.lib;opencv_imgcodecs341.lib;opencv_imgproc341.lib;opencv_ml341.lib;opencv_objdetect341.lib;opencv_photo341.lib;opencv_shape341.lib;opencv_stitching341.lib;opencv_superres341.lib;opencv_video341.lib;opencv_videoio341.lib;opencv_videostab341.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,7 +144,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_aruco341.lib;opencv_calib3d341.lib;opencv_core341.lib;opencv_dnn341.lib;opencv_features2d341.lib;opencv_flann341.lib;opencv_highgui341.lib;opencv_imgcodecs341.lib;opencv_imgproc341.lib;opencv_ml341.lib;opencv_objdetect341.lib;opencv_photo341.lib;opencv_shape341.lib;opencv_stitching341.lib;opencv_superres341.lib;opencv_video341.lib;opencv_videoio341.lib;opencv_videostab341.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_aruco341.lib;opencv_calib3d341.lib;opencv_core341.lib;opencv_dnn341.lib;opencv_features2d341.lib;opencv_flann341.lib;opencv_highgui341.lib;opencv_imgcodecs341.lib;opencv_imgproc341.lib;opencv_ml341.lib;opencv_objdetect341.lib;opencv_photo341.lib;opencv_shape341.lib;opencv_stitching341.lib;opencv_superres341.lib;opencv_video341.lib;opencv_videoio341.lib;opencv_videostab341.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

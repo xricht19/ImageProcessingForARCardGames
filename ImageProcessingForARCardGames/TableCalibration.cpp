@@ -40,6 +40,12 @@ void TableCalibration::DrawDetectedMarkersInImage(cv::Mat inputImage)
     cv::namedWindow("arUco");
     std::cout << _markersIDs.size() << std::endl;
     cv::aruco::drawDetectedMarkers(inputImage, _markersCorners, _markersIDs, cv::Scalar(0,0,255));
+	/*for (int i = 0; i < _markersCorners.size(); i++)
+		std::cout << _markersCorners[i] << std::endl;*/
+	/*for (int i = 0; i < _rejectedCandidates.size(); i++)
+	{
+		cv::rectangle(inputImage, _rejectedCandidates[i][0], _rejectedCandidates[i][2], cv::Scalar(255, 0, 0), 2);
+	}*/
     cv::imshow("arUco", inputImage);
 }
 
