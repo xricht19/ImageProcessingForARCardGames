@@ -209,9 +209,31 @@ namespace IDAP
 		}
 	}
 
+    CameraCalibration* ImageDetectionAccessPoint::GetCameraCalibration()
+    {
+        // prepare structure for calibration
+        if (_cameraCalib == nullptr)
+        {
+            _cameraCalib = new CameraCalibration();
+        }
+        return _cameraCalib;
+    }
+
+    TableCalibration* ImageDetectionAccessPoint::GetTableCalibration()
+    {
+        // prepare structure for calibration
+        if (_tableCalib == nullptr)
+        {
+            _tableCalib = new TableCalibration();
+        }
+        return _tableCalib;
+    }
+
     // public function area -------------------------------------------------------------------
 	ImageDetectionAccessPoint::ImageDetectionAccessPoint()
 	{
+        _cameraCalib = nullptr;
+        _tableCalib = nullptr;
 		errorCode = OK;
 	}
 
@@ -219,9 +241,10 @@ namespace IDAP
 	ImageDetectionAccessPoint::~ImageDetectionAccessPoint()
 	{
         if(_cameraCalib != nullptr)
-        {
             delete(_cameraCalib);
-        }
+        if (_tableCalib != nullptr)
+            delete(_tableCalib);
+
 		freeSettings();
 	}
 
@@ -285,12 +308,19 @@ namespace IDAP
 			errorCode = ErrorCodes::FRAME_WAS_NOT_READ;
 		}
 		else {
-			rows = (uint16_t)frame.rows;
-			columns = (uint16_t)frame.cols;
-			channels = (uint16_t)frame.channels();
+			rows = static_cast<uint16_t>(frame.rows);
+			columns = static_cast<uint16_t>(frame.cols);
+			channels = static_cast<uint16_t>(frame.channels());
 			//unsigned char *buffer = new unsigned char[rows*columns*channels];
-			std::memcpy(dataBytes, frame.data, rows*columns*channels);
+			//std::memcpy(dataBytes, frame.data, rows*columns*channels);
 			//dataBytes = buffer;
+            //Convert from BGR to RGBA
+            cv::Mat rotImg, rgbRotImg;
+            const cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(static_cast<float>(frame.cols/2), static_cast<float>(frame.rows/2)), 180, 1);
+            cv::warpAffine(frame, rotImg, rot, cv::Size(frame.cols, frame.rows));
+            cv::cvtColor(rotImg, rgbRotImg, CV_BGR2RGBA);
+
+            std::memcpy(dataBytes, rgbRotImg.data, rgbRotImg.total() * rgbRotImg.elemSize());
 		}
 	}
 
@@ -347,10 +377,10 @@ namespace IDAP
         case OK:
             break;
         case CANNOT_OPEN_VIDEO_STREAM:
-            fprintf(stderr, "Cannot open video stream for input: %s", data);
+            fprintf(stderr, "Cannot open video stream for input: %s", data.c_str());
             break;
         default:
-            fprintf(stderr, "Unknown error: %s", data);
+            fprintf(stderr, "Unknown error: %s", data.c_str());
             break;
         }
     }
@@ -365,8 +395,8 @@ namespace IDAP
             return;
         }
 
-        // prepare structure for calibration
-        _cameraCalib = new CameraCalibration();
+        // prepare structure for table calibration
+        _tableCalib = new TableCalibration();
 	}
 
     void ImageDetectionAccessPoint::InitImageDetectionAccessPointData(uint16_t& errorCode, const char* settingsPath, int tableID)

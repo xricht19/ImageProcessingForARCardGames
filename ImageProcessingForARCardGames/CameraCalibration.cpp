@@ -38,8 +38,9 @@ namespace IDAP
     CameraCalibration::CameraCalibration()
     {
         _originInFrame = cv::Vec<int, 2>(0, 0);
-        _cameramatrix = cv::Mat::eye(3, 3, CV_64F);
+        _cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
         _distanceCoeff = cv::Mat::zeros(8, 1, CV_64F);
+        _isError = false;
     }
 
 
@@ -57,29 +58,35 @@ namespace IDAP
 
     void CameraCalibration::Calibrate()
     {
-        cv::namedWindow("CalibrationProcess", CV_WINDOW_NORMAL);
-
         // find real corners
         std::vector<std::vector<cv::Point2f>> foundedCorners;
-        GetChessboardCorners(foundedCorners, false);
+        GetChessboardCorners(foundedCorners, true);
+
+        if (foundedCorners.empty())
+        {
+            fprintf(stderr, "Not found any correct image!");
+            _isError = true;
+            return;
+        }
 
         // all corners we should found
         std::vector<std::vector<cv::Point3f>> worldSpaceCornerPoints(1);
         CreateKnownBoardPositions(worldSpaceCornerPoints[0]);
         
         // remap 2d founded corners to 3d expected corners
-        worldSpaceCornerPoints.resize(_calibrationImages.size(), worldSpaceCornerPoints[0]);
+        worldSpaceCornerPoints.resize(foundedCorners.size(), worldSpaceCornerPoints[0]);
 
         std::vector<cv::Mat> rVectors, tVectors;
 
-        cv::calibrateCamera(worldSpaceCornerPoints, foundedCorners, _chessboardDimension, _cameramatrix, _distanceCoeff, rVectors, tVectors);
+        cv::calibrateCamera(worldSpaceCornerPoints, foundedCorners, _chessboardDimension, _cameraMatrix, _distanceCoeff, rVectors, tVectors);
 
+        cv::namedWindow("CalibrationImages", CV_WINDOW_NORMAL);
         for (auto &image : _calibrationImages)
         {
-            cv::imshow("CalibrationProcess", image);
+            cv::imshow("CalibrationImages", image);
             cv::waitKey(1000);
         }
-        cv::destroyWindow("CalibrationProcess");
+        cv::destroyWindow("CalibrationImages");
 
     }
 
@@ -91,25 +98,31 @@ namespace IDAP
             numberOfData = 0;
     }
 
-    bool CameraCalibration::saveCameraCalib(std::string name)
+    bool CameraCalibration::SaveCameraCalib(std::string name)
     {
         std::ofstream outStream(name);
         if (outStream)
         {
-            uint16_t rows = _cameramatrix.rows;
-            uint16_t cols = _cameramatrix.cols;
+            uint16_t rows = _cameraMatrix.rows;
+            uint16_t cols = _cameraMatrix.cols;
+
+            outStream << rows << std::endl;
+            outStream << cols << std::endl;
 
             for (int r = 0; r < rows; r++)
             {
                 for (int c = 0; c < cols; c++)
                 {
-                    double value = _cameramatrix.at<double>(r, c);
+                    double value = _cameraMatrix.at<double>(r, c);
                     outStream << value << std::endl;
                 }
             }
 
             rows = _distanceCoeff.rows;
             cols = _distanceCoeff.cols;
+
+            outStream << rows << std::endl;
+            outStream << cols << std::endl;
 
             for (int r = 0; r < rows; r++)
             {
@@ -121,6 +134,48 @@ namespace IDAP
             }
 
             outStream.close();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool CameraCalibration::LoadCameraCalib(std::string name)
+    {
+        std::ifstream inStream(name);
+        if(inStream)
+        {
+            uint16_t rows;
+            uint16_t cols;
+
+            // camera matrix
+            inStream >> rows;
+            inStream >> cols;
+            _cameraMatrix = cv::Mat(cv::Size(cols, rows), CV_64F);
+            for (int r = 0; r < rows; r++)
+            {
+                for (int c = 0; c < cols; c++)
+                {
+                    double value = 0.0;
+                    inStream >> value;
+                    _cameraMatrix.at<double>(r, c) = value;
+                }
+            }
+
+            // distance coefficient
+            inStream >> rows;
+            inStream >> cols;
+            _distanceCoeff = cv::Mat::zeros(rows, cols, CV_64F);
+            for (int r = 0; r < rows; r++)
+            {
+                for (int c = 0; c < cols; c++)
+                {
+                    double value = 0.0;
+                    inStream >> value;
+                    _distanceCoeff.at<double>(r, c) = value;
+                }
+            }
+            inStream.close();
             return true;
         }
 

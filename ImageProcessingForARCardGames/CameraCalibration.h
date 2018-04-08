@@ -3,7 +3,10 @@
 #include <fstream>
 #include <iostream>
 
-#define ENOUGH_IMAGES_FOR_CALIB 10
+#define ENOUGH_IMAGES_FOR_CALIB 15
+#define CHESSBOARD_WIDTH 6
+#define CHESSBOARD_HEIGHT 9
+#define CHESSBOARD_SQUARE_SIZE 0.024f
 
 namespace IDAP
 {
@@ -15,12 +18,14 @@ namespace IDAP
         // results of calibration
         cv::Vec<int, 2> _originInFrame;
 
+        // error
+        bool _isError;
 
         // constant for calibration
-        const float _squareDimension = 0.024f; // in meters
-        const cv::Size _chessboardDimension = cv::Size(6,9);
+        const float _squareDimension = CHESSBOARD_SQUARE_SIZE; // in meters
+        const cv::Size _chessboardDimension = cv::Size(CHESSBOARD_WIDTH, CHESSBOARD_HEIGHT);
         // calibration result
-        cv::Mat _cameramatrix;
+        cv::Mat _cameraMatrix;
         cv::Mat _distanceCoeff;
 
         void CreateKnownBoardPositions(std::vector<cv::Point3f>& corners);
@@ -36,10 +41,13 @@ namespace IDAP
         /// return value > 0 if there is more than 4 image for calibration 
         void IsEnoughData(uint16_t& numberOfData) const;
 
-        bool saveCameraCalib(std::string name);
+        bool SaveCameraCalib(std::string name);
+        bool LoadCameraCalib(std::string name);
 
-        cv::Mat GetCameraMatrix() const { return _cameramatrix; }
+        cv::Mat GetCameraMatrix() const { return _cameraMatrix; }
         cv::Mat GetDistanceCoeff() const { return _distanceCoeff; }
+
+        bool IsErrorOccure() const { return _isError; }
     };
 }
 

@@ -10,6 +10,7 @@
 #include "PlayerAreaChangeDetector.h"
 #include "CardAreaDetection.h"
 #include "CameraCalibration.h"
+#include "TableCalibration.h"
 
 #include "rapidxml-1.13\rapidxml.hpp"
 #include "rapidxml-1.13\rapidxml_utils.hpp"
@@ -119,6 +120,9 @@ namespace IDAP
         // camera calibration variables
         CameraCalibration* _cameraCalib;
 
+        // table calibration variables
+        TableCalibration* _tableCalib;
+
 	public:
 		ImageDetectionAccessPoint();
 		~ImageDetectionAccessPoint();
@@ -163,6 +167,9 @@ namespace IDAP
 		void freeSettings();
 
         // camera calibration access
-        CameraCalibration* GetCalibration() const { return _cameraCalib; }
+        CameraCalibration* GetCameraCalibration();
+
+        // table calibration access
+        TableCalibration* GetTableCalibration();
 	};
 }
