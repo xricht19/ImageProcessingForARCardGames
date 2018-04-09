@@ -7,7 +7,7 @@
 
 #define NUMBER_OF_MARKERS_GENERATED 4 //max 50
 #define ARUCO_PREDEFINED_DICTIONARY cv::aruco::DICT_4X4_50
-#define MARKERS_REAL_SIZE_CENTIMETERS 12
+#define MARKERS_REAL_SIZE_CENTIMETERS 12.4
 
 class TableCalibration
 {
@@ -20,32 +20,59 @@ private:
     struct markerInfo
     {
         int ID;
-        cv::Point Position;
-        float cmInPixels;
-        int realSizeInCm;
+        cv::Point Position; // first corner in corner list (top left corner)
+        float cmInPixelsWidth;
+        float cmInPixelHeight;
+        float realSizeInCm;
     };
-    std::map<int, markerInfo> markersInfos;
+    std::map<int, markerInfo*> _markersInfos;
     // table calibration final values
     struct tableCalibrationResults
     {
-        float cmInPixels;
+        float cmInPixelsWidth;
+        float cmInPixelHeight;
         int xPos;
         int yPos;
         int width;
         int height;
-        cv::Mat affineTransformMatrix;
+        cv::Mat perspectiveProjectionMatrix;
     };
+    tableCalibrationResults* _tableCalibResults;
+
+    enum Corner
+    {
+        TOP_LEFT = 0,
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT,
+        TOP_RIGHT
+    };
+    enum Direction
+    {
+        HORIZONTAL = 0,
+        VERTICAL
+    };
+
+    // calculate real size from four points in image and real size
+    float GetCmInPixels(std::vector<cv::Point2f> points, float realSize, Direction d);
+    // mean of already known sizes from separate markers
+    float GetCmInPixels(Direction d);
+
+    // clear functions
+    // delete all struct in _markersInfos map
+    void ClearMarkersInfos();
+
+    
 
 public:
     TableCalibration();
     ~TableCalibration();
 
     void InitTableCalibration();
-    bool HasFourPoints();
+    bool HasFourPoints() const;
     void DetectMarkers(cv::Mat inputImage);
     void DrawDetectedMarkersInImage(cv::Mat inputImage);
     
-    void CalculateTableCalibrationResults();
+    void CalculateTableCalibrationResults(cv::Mat inputImage);
 
     static void CreateArucoMarkers(std::string path);
 };

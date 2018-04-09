@@ -235,6 +235,8 @@ namespace IDAP
         _cameraCalib = nullptr;
         _tableCalib = nullptr;
 		errorCode = OK;
+        _flipHorizontally = false;
+        _flipVertically = false;
 	}
 
 
@@ -265,23 +267,28 @@ namespace IDAP
 
 	void ImageDetectionAccessPoint::PrepareNextFrame(uint16_t &errorCode)
 	{
-		if (!usingROS)
-		{
-			if (!openedStream.isOpened()) {
-				errorCode = ErrorCodes::VIDEO_STREAM_IS_NOT_OPENED;
-			}
-			else {
-				// get next frame
-				openedStream >> frame;
-				if (frame.empty()) {
-					errorCode = ErrorCodes::CANNOT_GET_IMAGE_FROM_CAMERA;
-				}
-				// sub sample frame for faster processing
-				cv::Size s100x100(100, 100);
-				cv::resize(frame, subSampledFrame, s100x100);
-			}
+		if (!openedStream.isOpened()) {
+			errorCode = ErrorCodes::VIDEO_STREAM_IS_NOT_OPENED;
 		}
+		else {
+			// get next frame
+            cv::Mat rawFrame;
+			openedStream >> rawFrame;
+			if (rawFrame.empty()) {
+				errorCode = ErrorCodes::CANNOT_GET_IMAGE_FROM_CAMERA;
+			}
+            // flip image if requested
+            if (_flipVertically && _flipHorizontally)
+                cv::flip(rawFrame, frame, -1);
+            else if (_flipVertically)
+                cv::flip(rawFrame, frame, 1);
+            else if (_flipHorizontally)
+                cv::flip(rawFrame, frame, 0);
 
+			// sub sample frame for faster processing
+			cv::Size s100x100(100, 100);
+			cv::resize(frame, subSampledFrame, s100x100);
+		}
 	}
 
 	void ImageDetectionAccessPoint::GetCurrentFrameSize(uint16_t &errorCode, uint16_t &rows, uint16_t &columns, uint16_t &channels)

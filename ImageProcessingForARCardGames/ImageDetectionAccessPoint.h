@@ -83,6 +83,9 @@ namespace IDAP
 		cv::VideoCapture openedStream;
 		cv::Mat frame;
 		cv::Mat subSampledFrame; // frame in size 100 x 100
+        bool _flipVertically;
+        bool _flipHorizontally;
+
 		std::map<int, PlayerAreaActiveDetector*> isPlayerActiveDetectors;
 		std::map<int, CardAreaDetection*> cardAreaDetectors;
 
@@ -159,6 +162,8 @@ namespace IDAP
 
 		int errorCode;
 
+        void SetFlipHorizontally(bool value) { _flipHorizontally = value; }
+        void SetFlipVertically(bool value) { _flipVertically = value; }
 		
 		cv::Mat getFrame();
 		cv::Mat getSubSampledFrame();

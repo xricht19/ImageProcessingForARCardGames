@@ -6,7 +6,7 @@
 #include "CameraCalibration.h"
 
 #define TABLE_ID 0
-#define CAMERA_CALIBRATION_FILE "IDAP_CameraCalibCoeff"
+#define CAMERA_CALIBRATION_FILE "IDAP_CameraCalibCoeff_kinect2"
 
 
 int main() {
@@ -69,6 +69,9 @@ int main() {
 		delete(access);
 		exit(1);
 	}
+    // IF USING KINECT FLIP THE IMAGE ON Y AXIS
+    access->SetFlipVertically(true);
+
     // ----------------------------------- CAMERA  CALIBRATION ---------------------------------------
     // check if camera calibration file exists, skip calibration in that case
     if (!access->GetCameraCalibration()->LoadCameraCalib(CAMERA_CALIBRATION_FILE))
@@ -153,6 +156,10 @@ int main() {
             tblCalib->DetectMarkers(undistFrame);
             tblCalib->DrawDetectedMarkersInImage(undistFrame);
         }
+        else // we have four points, perform calibration
+        {
+            tblCalib->CalculateTableCalibrationResults(undistFrame);
+        }
 
         // show
         cv::imshow("CalibTest_undistorted", undistFrame);
@@ -173,7 +180,9 @@ int main() {
         nameId++;
 
     }
-    cv::destroyWindow("CalibTest");
+    cv::destroyWindow("CalibTest_undistorted");
+    cv::destroyWindow("CalibTest_distorted");
+
     
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------
     access->InitImageDetectionAccessPointData(errorCode, path.data(), TABLE_ID);
