@@ -16,6 +16,8 @@ namespace IDAP
         extern DllExport void InitImageDetectionAccessPointDataCaller(ImageDetectionAccessPoint*, uint16_t&, const char*, uint16_t);
 		extern DllExport void InitImageDetectionAccessPointROSCaller(ImageDetectionAccessPoint*, uint16_t&, uchar*, uint16_t&);
 		extern DllExport void GetVideoResolutionCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, uint16_t&);
+        extern DllExport void SetFlipHorizontallyCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&);
+        extern DllExport void SetFlipVerticallyCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&);
 
 		extern DllExport void PrepareNextFrameCaller(ImageDetectionAccessPoint*, uint16_t&);
 		extern DllExport void GetCurrentFrameSizeCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, uint16_t&, uint16_t&);

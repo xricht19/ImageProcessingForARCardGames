@@ -7,7 +7,9 @@
 
 #define TABLE_ID 0
 #define CAMERA_CALIBRATION_FILE "IDAP_CameraCalibCoeff_kinect2"
-
+#define CHESSBOARD_WIDTH 6
+#define CHESSBOARD_HEIGHT 9
+#define CHESSBOARD_SQUARE_SIZE 0.0232f
 
 int main() {
 	std::cout << "StartMain" << std::endl;
@@ -78,6 +80,8 @@ int main() {
     {
         cv::namedWindow("CameraCalib");
         uint16_t enoughData = 0;
+        access->GetCameraCalibration()->SetChessboardDimension(CHESSBOARD_WIDTH, CHESSBOARD_HEIGHT);
+        access->GetCameraCalibration()->SetSquareDimension(CHESSBOARD_SQUARE_SIZE);
         access->GetCameraCalibration()->IsEnoughData(enoughData);
 		int timeCounter = 0;
         while (!enoughData)
@@ -92,8 +96,9 @@ int main() {
             }
 
             cv::imshow("CameraCalib", access->getFrame());
-            char pressed = cv::waitKey(1000/25);       // cca 25 fps
-			if (timeCounter >= 50)
+            const int fps = 1000 / 25;
+            char pressed = cv::waitKey(fps);       // cca 25 fps
+			if (timeCounter >= 2000/fps)                      // 2 second between catching the image
 			{
 				access->GetCameraCalibration()->AddImageWithChessboard(access->getFrame());
 				access->GetCameraCalibration()->IsEnoughData(enoughData);
@@ -124,21 +129,17 @@ int main() {
         cv::waitKey(1000 / 20); // 20 fps 
         enoughNumber++;
     }
-    cv::Mat frame = access->getFrame();
-    cv::Mat undistFrame;
-    cv::undistort(frame, undistFrame, access->GetCameraCalibration()->GetCameraMatrix(), access->GetCameraCalibration()->GetDistanceCoeff());
+    const cv::Mat frame = access->getFrame();
     // detect aruco markers and show them
     TableCalibration* tblCalib = access->GetTableCalibration();
     
-    cv::namedWindow("CalibTest_undistorted", CV_WINDOW_NORMAL);
-    cv::namedWindow("CalibTest_distorted", CV_WINDOW_NORMAL);
-
-    int nameId = 0;
+    cv::namedWindow("CalibResult", CV_WINDOW_NORMAL);
     // check calibration result
     while (true)
     {
         // prepare next frame
         access->PrepareNextFrame(errorCode);
+        const cv::Mat currentFrame = access->getFrame();
         if (errorCode != IDAP::ImageDetectionAccessPoint::OK)
         {
             IDAP::ImageDetectionAccessPoint::IDAPPrintError(errorCode, std::to_string(cameraId));
@@ -146,25 +147,21 @@ int main() {
             exit(1);
         }
 
-        cv::Mat frame = access->getFrame();
-        cv::Mat undistFrame;
-        cv::undistort(frame, undistFrame, access->GetCameraCalibration()->GetCameraMatrix(), access->GetCameraCalibration()->GetDistanceCoeff());
         // already have four markers, don't look for them anymore
         if (!tblCalib->HasFourPoints())
         {
             tblCalib->InitTableCalibration();
-            tblCalib->DetectMarkers(undistFrame);
-            tblCalib->DrawDetectedMarkersInImage(undistFrame);
+            tblCalib->DetectMarkers(currentFrame);
+            tblCalib->DrawDetectedMarkersInImage(currentFrame);
         }
         else // we have four points, perform calibration
         {
-            tblCalib->CalculateTableCalibrationResults(undistFrame);
+            tblCalib->CalculateTableCalibrationResults(currentFrame);
         }
 
         // show
-        cv::imshow("CalibTest_undistorted", undistFrame);
-        cv::imshow("CalibTest_distorted", frame);
-        char pressed = cv::waitKey(1000 / 35);
+        cv::imshow("CalibResult", currentFrame);
+        const char pressed = cv::waitKey(1000 / 35);
         if (pressed == 'q') // stop
         {
             break;
@@ -173,15 +170,8 @@ int main() {
         {
             tblCalib->InitTableCalibration();
         }
-
-        /*cv::imwrite("undist" + std::to_string(nameId) + ".png", undistFrame);
-        cv::imwrite("dist" + std::to_string(nameId) + ".png", frame);*/
-
-        nameId++;
-
     }
-    cv::destroyWindow("CalibTest_undistorted");
-    cv::destroyWindow("CalibTest_distorted");
+    cv::destroyWindow("CalibResult");
 
     
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------

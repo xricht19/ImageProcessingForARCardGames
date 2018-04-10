@@ -4,9 +4,6 @@
 #include <iostream>
 
 #define ENOUGH_IMAGES_FOR_CALIB 25
-#define CHESSBOARD_WIDTH 6
-#define CHESSBOARD_HEIGHT 9
-#define CHESSBOARD_SQUARE_SIZE 0.024f
 
 namespace IDAP
 {
@@ -17,23 +14,32 @@ namespace IDAP
 
         // results of calibration
         cv::Vec<int, 2> _originInFrame;
-
         // error
         bool _isError;
-
+        uint16_t _errorCode;
+        std::string _errorMsg;
         // constant for calibration
-        const float _squareDimension = CHESSBOARD_SQUARE_SIZE; // in meters
-        const cv::Size _chessboardDimension = cv::Size(CHESSBOARD_WIDTH, CHESSBOARD_HEIGHT);
+        float _squareDimension;
+        cv::Size _chessboardDimension;
         // calibration result
         cv::Mat _cameraMatrix;
         cv::Mat _distanceCoeff;
+        double _calibrationScore;
 
         void CreateKnownBoardPositions(std::vector<cv::Point3f>& corners);
         void GetChessboardCorners(std::vector<std::vector<cv::Point2f>>& allFoundCorners, bool showResult = false);
 
+        enum ErrorStates
+        {
+            OK = 0,
+            NO_PARAM_FOR_CALIB_SET,
+            NOT_ENOUGH_IMAGES,
+            NO_CORNERS_FOUND
+        };
+
     public:
         CameraCalibration();
-        ~CameraCalibration();
+        ~CameraCalibration() = default;
 
         void AddImageWithChessboard(const cv::Mat& frame);
         void Calibrate();
@@ -47,7 +53,14 @@ namespace IDAP
         cv::Mat GetCameraMatrix() const { return _cameraMatrix; }
         cv::Mat GetDistanceCoeff() const { return _distanceCoeff; }
 
+        void SetSquareDimension(float value) { _squareDimension = value; }
+        void SetChessboardDimension(int width, int height) { _chessboardDimension = cv::Size(width, height); }
+
         bool IsErrorOccure() const { return _isError; }
+        std::string GetErrorMsg() const { return _errorMsg; }
+
+        bool IsCalibrationDone() const;
+    
     };
 }
 

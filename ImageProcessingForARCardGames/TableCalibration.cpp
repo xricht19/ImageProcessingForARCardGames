@@ -26,34 +26,37 @@ void TableCalibration::ClearMarkersInfos()
 
 
 
-float TableCalibration::GetCmInPixels(std::vector<cv::Point2f> points, float realSize, Direction d)
+float TableCalibration::GetCmInPixels(std::vector<cv::Point2f> points, float realSize)
 {
     float distance = 0;
+    const int numOfElem = points.size();
     // take two point next to each other and calculate distance
-    if (d == HORIZONTAL)
+    for (int i = 0; i < numOfElem; i++)
     {
-        distance += cv::norm(points[TOP_LEFT] - points[TOP_RIGHT]);
-        distance += cv::norm(points[BOTTOM_LEFT] - points[BOTTOM_RIGHT]);
+        const int i_1 = (i + 1) % numOfElem;
+        distance += cv::norm(points[i] - points[i_1]);
     }
-    else 
-    {
-        distance += cv::norm(points[TOP_LEFT] - points[BOTTOM_LEFT]);
-        distance += cv::norm(points[TOP_RIGHT] - points[BOTTOM_RIGHT]);
-    }
-    return (distance / 2.0f)/realSize;
+    return (distance / static_cast<float>(numOfElem))/realSize;
 }
 
-float TableCalibration::GetCmInPixels(Direction d)
+float TableCalibration::GetCmInPixels()
 {
     float value = 0.f;
     for (auto &item : _markersInfos)
     {
-        if (d == VERTICAL)
-            value += item.second->cmInPixelHeight;
-        else
-            value += item.second->cmInPixelsWidth;
+        value += item.second->cmInPixels;
     }
     return value / _markersInfos.size();
+}
+
+int TableCalibration::GetPosistionMarkerIDZero()
+{
+    for (int i = 0; i < _markersIDs.size(); i++)
+    {
+        if (_markersIDs[i] == 0)
+            return i;
+    }
+    return 0;
 }
 
 
@@ -126,28 +129,24 @@ void TableCalibration::CalculateTableCalibrationResults(cv::Mat inputImage)
         struct markerInfo* mrkrInf = new markerInfo;
         mrkrInf->ID = _markersIDs[i];
         mrkrInf->Position = _markersCorners[i][0]; // top left corner
-        mrkrInf->realSizeInCm = MARKERS_REAL_SIZE_CENTIMETERS;
-        mrkrInf->cmInPixelsWidth = GetCmInPixels(_markersCorners[i], mrkrInf->realSizeInCm, HORIZONTAL);
-        mrkrInf->cmInPixelHeight = GetCmInPixels(_markersCorners[i], mrkrInf->realSizeInCm, VERTICAL);
+        mrkrInf->cmInPixels = GetCmInPixels(_markersCorners[i], MARKERS_REAL_SIZE_CENTIMETERS);
         // finaly push to vector
         _markersInfos.insert(std::make_pair(_markersIDs[i], mrkrInf));
     }
 
     // calculate projection matrix to undistort the image
-    std::vector<cv::Point2f> projectionPointsSource(_markersIDs.size()); // contain four corners of table from image, starting with top left to
-    std::vector<cv::Point2f> projectionPointsTarget(_markersIDs.size()); // contain four corners of table, starting with top left to
-    for (int i = 0; i < _markersIDs.size(); i++)
-    {
-        projectionPointsSource.at(_markersIDs[i]) = _markersCorners[i][0];
-    }
+    const int infoSize = GetInfoSize();
+    std::vector<cv::Point2f> projectionPointsSource(infoSize); // contain four corners of table from image, starting with top left to
+    std::vector<cv::Point2f> projectionPointsTarget(infoSize); // contain four corners of table, starting with top left to
+    for (int i = 0; i < infoSize; i++)
+        projectionPointsSource.at(i) = _markersInfos[i]->Position;
 
-    // calculate the point it should reflect
+    // create corresponding points and push them to vector
     // calculate new dimension of image defined by markers
     const float maxWidth = MAX(cv::norm(projectionPointsSource[BOTTOM_RIGHT] - projectionPointsSource[BOTTOM_LEFT]),
         cv::norm(projectionPointsSource[TOP_RIGHT] - projectionPointsSource[TOP_LEFT]));
     const float maxHeight = MAX(cv::norm(projectionPointsSource[TOP_RIGHT] - projectionPointsSource[BOTTOM_RIGHT]),
-        cv::norm(projectionPointsSource[TOP_LEFT] - projectionPointsSource[BOTTOM_LEFT]));
-    // create new points and push them to vector
+        cv::norm(projectionPointsSource[TOP_LEFT] - projectionPointsSource[BOTTOM_LEFT]));    
     projectionPointsTarget[TOP_LEFT] = cv::Point2f(0, 0);
     projectionPointsTarget[BOTTOM_LEFT] = cv::Point2f(0, maxHeight);
     projectionPointsTarget[BOTTOM_RIGHT] = cv::Point2f(maxWidth, maxHeight);
@@ -155,11 +154,10 @@ void TableCalibration::CalculateTableCalibrationResults(cv::Mat inputImage)
 
     // calculate projection matrix
     _tableCalibResults->perspectiveProjectionMatrix = cv::getPerspectiveTransform(projectionPointsSource, projectionPointsTarget);
-    _tableCalibResults->cmInPixelsWidth = GetCmInPixels(HORIZONTAL);
-    _tableCalibResults->cmInPixelHeight = GetCmInPixels(VERTICAL);
+    _tableCalibResults->cmInPixels = GetCmInPixels();
     cv::Mat warped;
     cv::warpPerspective(inputImage, warped, _tableCalibResults->perspectiveProjectionMatrix, cv::Size(maxWidth, maxHeight));
-    cv::rectangle(warped, cv::Point2f(warped.size().width/2, warped.size().height/2), cv::Point2f(12.4 * _tableCalibResults->cmInPixelsWidth + warped.size().width / 2, 12.4 * _tableCalibResults->cmInPixelHeight + warped.size().height / 2), cv::Scalar(0, 0, 255));
+    cv::rectangle(warped, cv::Point2f(0, 0), cv::Point2f(12.4f * _tableCalibResults->cmInPixels, 12.4f * _tableCalibResults->cmInPixels), cv::Scalar(0, 0, 255));
 
     cv::imshow("markerCorners", warped);
 }

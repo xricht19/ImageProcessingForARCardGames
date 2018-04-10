@@ -7,7 +7,7 @@
 
 #define NUMBER_OF_MARKERS_GENERATED 4 //max 50
 #define ARUCO_PREDEFINED_DICTIONARY cv::aruco::DICT_4X4_50
-#define MARKERS_REAL_SIZE_CENTIMETERS 12.4
+#define MARKERS_REAL_SIZE_CENTIMETERS 12.4f
 
 class TableCalibration
 {
@@ -21,16 +21,13 @@ private:
     {
         int ID;
         cv::Point Position; // first corner in corner list (top left corner)
-        float cmInPixelsWidth;
-        float cmInPixelHeight;
-        float realSizeInCm;
+        float cmInPixels;
     };
     std::map<int, markerInfo*> _markersInfos;
     // table calibration final values
     struct tableCalibrationResults
     {
-        float cmInPixelsWidth;
-        float cmInPixelHeight;
+        float cmInPixels;
         int xPos;
         int yPos;
         int width;
@@ -53,10 +50,11 @@ private:
     };
 
     // calculate real size from four points in image and real size
-    float GetCmInPixels(std::vector<cv::Point2f> points, float realSize, Direction d);
+    float GetCmInPixels(std::vector<cv::Point2f> points, float realSize);
     // mean of already known sizes from separate markers
-    float GetCmInPixels(Direction d);
-
+    float GetCmInPixels();
+    int GetPosistionMarkerIDZero();
+    int GetInfoSize() { return _markersInfos.size(); }
     // clear functions
     // delete all struct in _markersInfos map
     void ClearMarkersInfos();

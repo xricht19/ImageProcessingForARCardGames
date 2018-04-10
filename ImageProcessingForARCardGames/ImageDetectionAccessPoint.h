@@ -98,11 +98,6 @@ namespace IDAP
 		// loaded card data for matching
 		std::map<std::string, cv::Mat> gameCardData;
 
-		int centralAreaX;
-		int centralAreaY;
-		int centralAreaWidth;
-		int centralAreaHeight;
-
 		bool usingROS = false;
 
 		// card data for template matching

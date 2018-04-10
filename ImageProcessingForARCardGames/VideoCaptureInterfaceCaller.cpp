@@ -57,4 +57,14 @@ namespace IDAP
 	void IsCardChangedByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& positionID, uint16_t& cardID) {
 		instance->IsCardChangedByID(errorCode, positionID, cardID);
 	}
+
+    void SetFlipHorizontallyCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& value)
+    {
+        instance->SetFlipHorizontally(static_cast<bool>(value));
+    }
+
+    void SetFlipVerticallyCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& value)
+    {
+        instance->SetFlipVertically(static_cast<bool>(value));
+    }
 }

@@ -272,18 +272,26 @@ namespace IDAP
 		}
 		else {
 			// get next frame
-            cv::Mat rawFrame;
+            cv::Mat rawFrame, flippedFrame;
 			openedStream >> rawFrame;
 			if (rawFrame.empty()) {
 				errorCode = ErrorCodes::CANNOT_GET_IMAGE_FROM_CAMERA;
 			}
             // flip image if requested
             if (_flipVertically && _flipHorizontally)
-                cv::flip(rawFrame, frame, -1);
+                cv::flip(rawFrame, flippedFrame, -1);
             else if (_flipVertically)
-                cv::flip(rawFrame, frame, 1);
+                cv::flip(rawFrame, flippedFrame, 1);
             else if (_flipHorizontally)
-                cv::flip(rawFrame, frame, 0);
+                cv::flip(rawFrame, flippedFrame, 0);
+            else
+                flippedFrame = rawFrame.clone();
+
+            // if the camera is calibrated, apply to the frame
+            if (GetCameraCalibration()->IsCalibrationDone())
+            {
+                cv::undistort(flippedFrame, frame, GetCameraCalibration()->GetCameraMatrix(), GetCameraCalibration()->GetDistanceCoeff());
+            }
 
 			// sub sample frame for faster processing
 			cv::Size s100x100(100, 100);
