@@ -53,7 +53,7 @@ namespace IDAP
         cv::Mat GetCameraMatrix() const { return _cameraMatrix; }
         cv::Mat GetDistanceCoeff() const { return _distanceCoeff; }
 
-        void SetSquareDimension(float value) { _squareDimension = value; }
+        void SetSquareDimension(float value) { _squareDimension = 1000 * value; /* to meters */ }
         void SetChessboardDimension(int width, int height) { _chessboardDimension = cv::Size(width, height); }
 
         bool IsErrorOccure() const { return _isError; }

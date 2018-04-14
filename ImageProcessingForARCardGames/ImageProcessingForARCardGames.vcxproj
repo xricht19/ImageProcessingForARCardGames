@@ -23,6 +23,7 @@
     <ClInclude Include="CardAreaDetection.h" />
     <ClInclude Include="PlayerAreaChangeDetector.h" />
     <ClInclude Include="ImageDetectionAccessPoint.h" />
+    <ClInclude Include="ProjectorCalibration.h" />
     <ClInclude Include="TableCalibration.h" />
     <ClInclude Include="VideoCaptureInterfaceCaller.h" />
   </ItemGroup>
@@ -32,6 +33,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayerAreaChangeDetector.cpp" />
     <ClCompile Include="ImageDetectionAccessPoint.cpp" />
+    <ClCompile Include="ProjectorCalibration.cpp" />
     <ClCompile Include="TableCalibration.cpp" />
     <ClCompile Include="VideoCaptureInterfaceCaller.cpp" />
   </ItemGroup>

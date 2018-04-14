@@ -16,6 +16,8 @@ private:
     std::vector<std::vector<cv::Point2f>> _markersCorners /* used for store founded markers in image*/, _rejectedCandidates;
     cv::aruco::DetectorParameters _detectorParameters;  // parameters to set up the detector
 
+    bool _calibrationDone;
+
     // info obtained from markers
     struct markerInfo
     {
@@ -28,8 +30,6 @@ private:
     struct tableCalibrationResults
     {
         float cmInPixels;
-        int xPos;
-        int yPos;
         int width;
         int height;
         cv::Mat perspectiveProjectionMatrix;
@@ -67,11 +67,12 @@ public:
 
     void InitTableCalibration();
     bool HasFourPoints() const;
+    bool IsCalibrationDone() const;
     void DetectMarkers(cv::Mat inputImage);
-    void DrawDetectedMarkersInImage(cv::Mat inputImage);
     
     void CalculateTableCalibrationResults(cv::Mat inputImage);
-
+    void ApplyTableCalibrationMatrixOnInput(cv::Mat& inputImage) const;
+    
     static void CreateArucoMarkers(std::string path);
 };
 

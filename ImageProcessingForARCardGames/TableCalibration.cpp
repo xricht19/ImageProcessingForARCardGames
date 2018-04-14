@@ -68,6 +68,7 @@ void TableCalibration::InitTableCalibration()
         delete(_tableCalibResults);
     ClearMarkersInfos();
     _tableCalibResults = new tableCalibrationResults;
+    _calibrationDone = false;
 }
 
 bool TableCalibration::HasFourPoints() const
@@ -79,8 +80,14 @@ bool TableCalibration::HasFourPoints() const
     return false;
 }
 
+bool TableCalibration::IsCalibrationDone() const
+{
+    return _calibrationDone;
+}
+
 void TableCalibration::DetectMarkers(cv::Mat inputImage)
 {
+    InitTableCalibration();
     const cv::Ptr<cv::aruco::Dictionary> markerDictionary = cv::aruco::getPredefinedDictionary(ARUCO_PREDEFINED_DICTIONARY);
     const cv::Ptr<cv::aruco::DetectorParameters> detectorParams = cv::aruco::DetectorParameters::create();
     /*detectorParams->adaptiveThreshWinSizeMin = 3;
@@ -104,22 +111,9 @@ void TableCalibration::DetectMarkers(cv::Mat inputImage)
     detectorParams->errorCorrectionRate = 0.6;*/
 
     cv::aruco::detectMarkers(inputImage, markerDictionary, _markersCorners, _markersIDs, detectorParams, _rejectedCandidates);
+    cv::aruco::drawDetectedMarkers(inputImage, _markersCorners, _markersIDs, cv::Scalar(0, 0, 255));
 }
 
-void TableCalibration::DrawDetectedMarkersInImage(cv::Mat inputImage)
-{
-    cv::namedWindow("arUco");
-    std::cout << _markersIDs.size() << std::endl;
-    cv::aruco::drawDetectedMarkers(inputImage, _markersCorners, _markersIDs, cv::Scalar(0,0,255));
-	/*for (int i = 0; i < _markersCorners.size(); i++)
-		std::cout << _markersCorners[i] << std::endl;*/
-	/*for (int i = 0; i < _rejectedCandidates.size(); i++)
-	{
-		cv::rectangle(inputImage, _rejectedCandidates[i][0], _rejectedCandidates[i][2], cv::Scalar(255, 0, 0), 2);
-        cv::rectangle(inputImage, _rejectedCandidates[i][1], _rejectedCandidates[i][3], cv::Scalar(255, 0, 0), 2);
-	}*/
-    cv::imshow("arUco", inputImage);
-}
 
 void TableCalibration::CalculateTableCalibrationResults(cv::Mat inputImage)
 {
@@ -155,11 +149,16 @@ void TableCalibration::CalculateTableCalibrationResults(cv::Mat inputImage)
     // calculate projection matrix
     _tableCalibResults->perspectiveProjectionMatrix = cv::getPerspectiveTransform(projectionPointsSource, projectionPointsTarget);
     _tableCalibResults->cmInPixels = GetCmInPixels();
-    cv::Mat warped;
-    cv::warpPerspective(inputImage, warped, _tableCalibResults->perspectiveProjectionMatrix, cv::Size(maxWidth, maxHeight));
-    cv::rectangle(warped, cv::Point2f(0, 0), cv::Point2f(12.4f * _tableCalibResults->cmInPixels, 12.4f * _tableCalibResults->cmInPixels), cv::Scalar(0, 0, 255));
+    _tableCalibResults->height = maxHeight;
+    _tableCalibResults->width = maxWidth;
+    _calibrationDone = true;
+}
 
-    cv::imshow("markerCorners", warped);
+void TableCalibration::ApplyTableCalibrationMatrixOnInput(cv::Mat& inputImage) const
+{
+    cv::Mat warped;
+    cv::warpPerspective(inputImage, warped, _tableCalibResults->perspectiveProjectionMatrix, cv::Size(_tableCalibResults->width, _tableCalibResults->height));
+    inputImage = warped;
 }
 
 void TableCalibration::CreateArucoMarkers(std::string path)

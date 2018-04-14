@@ -9,7 +9,7 @@
 #define CAMERA_CALIBRATION_FILE "IDAP_CameraCalibCoeff_kinect2"
 #define CHESSBOARD_WIDTH 6
 #define CHESSBOARD_HEIGHT 9
-#define CHESSBOARD_SQUARE_SIZE 0.0232f
+#define CHESSBOARD_SQUARE_SIZE 232
 
 int main() {
 	std::cout << "StartMain" << std::endl;
@@ -122,13 +122,13 @@ int main() {
 
     // ----------------------------------- TABLE CALIBRATION - ARUCO ---------------------------------
     //TableCalibration::CreateArucoMarkers("arUcoMarkers");
-    int enoughNumber = 0;
+    /*int enoughNumber = 0;
     while (enoughNumber < 5) // 5 frames to let camera start
     {
         access->PrepareNextFrame(errorCode);
         cv::waitKey(1000 / 20); // 20 fps 
         enoughNumber++;
-    }
+    }*/
     const cv::Mat frame = access->getFrame();
     // detect aruco markers and show them
     TableCalibration* tblCalib = access->GetTableCalibration();
@@ -150,9 +150,7 @@ int main() {
         // already have four markers, don't look for them anymore
         if (!tblCalib->HasFourPoints())
         {
-            tblCalib->InitTableCalibration();
             tblCalib->DetectMarkers(currentFrame);
-            tblCalib->DrawDetectedMarkersInImage(currentFrame);
         }
         else // we have four points, perform calibration
         {
@@ -170,9 +168,25 @@ int main() {
         {
             tblCalib->InitTableCalibration();
         }
+        cv::waitKey();
     }
     cv::destroyWindow("CalibResult");
 
+    int i = 0;
+    cv::namedWindow("ToSave");
+    while(true)
+    {
+        access->PrepareNextFrame(errorCode);
+        std::string name = "TemplateMatchignInput/Image" + std::to_string(i++) + ".png";
+
+        cv::imshow("ToSave", access->getFrame());
+        const char pressed = cv::waitKey(0);
+        if (pressed == 's')
+            cv::imwrite(name, access->getFrame());
+        else if (pressed == 'q')
+            break;
+    }
+    cv::destroyWindow("ToSave");
     
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------
     access->InitImageDetectionAccessPointData(errorCode, path.data(), TABLE_ID);

@@ -292,6 +292,11 @@ namespace IDAP
             {
                 cv::undistort(flippedFrame, frame, GetCameraCalibration()->GetCameraMatrix(), GetCameraCalibration()->GetDistanceCoeff());
             }
+            // apply table calibration on frame if available
+            if (GetTableCalibration()->IsCalibrationDone())
+            {
+                GetTableCalibration()->ApplyTableCalibrationMatrixOnInput(frame);
+            }
 
 			// sub sample frame for faster processing
 			cv::Size s100x100(100, 100);
