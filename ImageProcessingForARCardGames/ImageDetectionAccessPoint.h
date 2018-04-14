@@ -11,6 +11,7 @@
 #include "CardAreaDetection.h"
 #include "CameraCalibration.h"
 #include "TableCalibration.h"
+#include "ProjectorCalibration.h"
 
 #include "rapidxml-1.13\rapidxml.hpp"
 #include "rapidxml-1.13\rapidxml_utils.hpp"
@@ -121,6 +122,9 @@ namespace IDAP
         // table calibration variables
         TableCalibration* _tableCalib;
 
+		// projector calibration
+		ProjectorCalibration* _projectorCalib;
+
 	public:
 		ImageDetectionAccessPoint();
 		~ImageDetectionAccessPoint();
@@ -171,5 +175,8 @@ namespace IDAP
 
         // table calibration access
         TableCalibration* GetTableCalibration();
+
+		// projection calibration access
+		ProjectorCalibration* GetProjectorCalibration();
 	};
 }

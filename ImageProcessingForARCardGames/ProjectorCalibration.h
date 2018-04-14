@@ -3,6 +3,8 @@
 #include <opencv2/core/mat.hpp>
 #include <map>
 
+#include "TableCalibration.h"
+
 #define CHESSBOARD_WIDTH 6
 #define CHESSBOARD_HEIGHT 9
 
@@ -21,21 +23,22 @@ private:
     uint16_t _errorCode;
     std::string _errorMsg;
 
-    void DetectChessboardCorners(cv::Mat image);
+    bool DetectChessboardCorners(cv::Mat image);
     void Get4CornersOfChessboard();
 
     enum ErrorStates
     {
         OK = 0,
         NO_PARAM_FOR_CALIB_SET,
-        NO_ALL_CORNERS_FOUND
+        NO_ALL_CORNERS_FOUND,
+		NO_DIFFERENT_CORNERS_FOUND
     };
 
 public:
     ProjectorCalibration();
     ~ProjectorCalibration();
 
-    void GetProjectionMatrix(uint16_t chessBoardFounded, float* output, cv::Mat inputImage);
+    void GetProjectionMatrix(float* output, cv::Mat inputImage, TableCalibration::tableCalibrationResults* tableCalibResult);
 
     void SetSquareDimension(float value) { _squareDimension = 1000 * value; /* to meters, must be calculate usign data from table calibration */ }
     void SetChessboardDimension(int width, int height) { _chessboardDimension = cv::Size(CHESSBOARD_WIDTH, CHESSBOARD_HEIGHT); } // fixed size according to chessboard sprite in unity

@@ -11,6 +11,15 @@
 
 class TableCalibration
 {
+public:
+	// table calibration final values
+	struct tableCalibrationResults
+	{
+		float cmInPixels;
+		int width;
+		int height;
+		cv::Mat perspectiveProjectionMatrix;
+	};
 private:
     std::vector<int> _markersIDs;   // markers to look for, determine the order in which are the _markersCorners stored
     std::vector<std::vector<cv::Point2f>> _markersCorners /* used for store founded markers in image*/, _rejectedCandidates;
@@ -26,14 +35,6 @@ private:
         float cmInPixels;
     };
     std::map<int, markerInfo*> _markersInfos;
-    // table calibration final values
-    struct tableCalibrationResults
-    {
-        float cmInPixels;
-        int width;
-        int height;
-        cv::Mat perspectiveProjectionMatrix;
-    };
     tableCalibrationResults* _tableCalibResults;
 
     enum Corner
@@ -59,8 +60,6 @@ private:
     // delete all struct in _markersInfos map
     void ClearMarkersInfos();
 
-    
-
 public:
     TableCalibration();
     ~TableCalibration();
@@ -72,6 +71,7 @@ public:
     
     void CalculateTableCalibrationResults(cv::Mat inputImage);
     void ApplyTableCalibrationMatrixOnInput(cv::Mat& inputImage) const;
+	tableCalibrationResults* GetTableCalibrationResult() { return _tableCalibResults; }
     
     static void CreateArucoMarkers(std::string path);
 };

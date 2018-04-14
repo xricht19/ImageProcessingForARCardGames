@@ -229,6 +229,16 @@ namespace IDAP
         return _tableCalib;
     }
 
+	ProjectorCalibration * ImageDetectionAccessPoint::GetProjectorCalibration()
+	{
+		// prepare structure for calibration
+		if (_projectorCalib == nullptr)
+		{
+			_projectorCalib = new ProjectorCalibration();
+		}
+		return _projectorCalib;
+	}
+
     // public function area -------------------------------------------------------------------
 	ImageDetectionAccessPoint::ImageDetectionAccessPoint()
 	{

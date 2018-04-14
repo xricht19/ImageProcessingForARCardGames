@@ -15,52 +15,52 @@ int main() {
 	std::cout << "StartMain" << std::endl;
 
 	IDAP::ImageDetectionAccessPoint *access = new IDAP::ImageDetectionAccessPoint();
-	
-	uint16_t errorCode = 0;
-    uint16_t cameraId = 0;
-    // get list of all cameras ----------- CAMERA SELECTION ------------------------------------------
-    /*{
-        uint16_t numOfAvailCam;
-        IDAP::ImageDetectionAccessPoint::GetNumberOfAllAvailableDevices(errorCode, numOfAvailCam);
-        if (errorCode == IDAP::ImageDetectionAccessPoint::ErrorCodes::OK)
-        {
-            // list all devices in loop
-            int temp = 0;
-            cv::Mat frame;
-            cv::namedWindow("CameraSelection");
-            while (true)
-            {
-                // open stream for camera
-                cv::VideoCapture selectCameraCapture = cv::VideoCapture(temp);
-                if (!selectCameraCapture.isOpened()) {
-                    errorCode = IDAP::ImageDetectionAccessPoint::ErrorCodes::CANNOT_OPEN_VIDEO_STREAM;
-                    break;
-                }
-                selectCameraCapture >> frame;
-                const cv::Size newFrSize = cv::Size(500, frame.rows*(500.0 / static_cast<float>(frame.cols)));
-                cv::resize(frame, frame, newFrSize);
-                cv::imshow("CameraSelection", frame);
-                const char pressed = cv::waitKey(1000);
-                if (pressed == 's')
-                {
-                    // destroy windows
-                    cv::destroyWindow("CameraSelection");
-                    selectCameraCapture.release();
-                    cameraId = temp;
-                    break;
-                }
-                temp = (temp + 1) % numOfAvailCam;
-            }
-        }
 
-        if (errorCode != IDAP::ImageDetectionAccessPoint::ErrorCodes::OK)
-        {
-            IDAP::ImageDetectionAccessPoint::IDAPPrintError(errorCode, std::to_string(cameraId));
-            delete(access);
-            exit(1);
-        }
-        std::cout << "Camera Seleted" << std::endl;
-    }*/
+	uint16_t errorCode = 0;
+	uint16_t cameraId = 0;
+	// get list of all cameras ----------- CAMERA SELECTION ------------------------------------------
+	/*{
+		uint16_t numOfAvailCam;
+		IDAP::ImageDetectionAccessPoint::GetNumberOfAllAvailableDevices(errorCode, numOfAvailCam);
+		if (errorCode == IDAP::ImageDetectionAccessPoint::ErrorCodes::OK)
+		{
+			// list all devices in loop
+			int temp = 0;
+			cv::Mat frame;
+			cv::namedWindow("CameraSelection");
+			while (true)
+			{
+				// open stream for camera
+				cv::VideoCapture selectCameraCapture = cv::VideoCapture(temp);
+				if (!selectCameraCapture.isOpened()) {
+					errorCode = IDAP::ImageDetectionAccessPoint::ErrorCodes::CANNOT_OPEN_VIDEO_STREAM;
+					break;
+				}
+				selectCameraCapture >> frame;
+				const cv::Size newFrSize = cv::Size(500, frame.rows*(500.0 / static_cast<float>(frame.cols)));
+				cv::resize(frame, frame, newFrSize);
+				cv::imshow("CameraSelection", frame);
+				const char pressed = cv::waitKey(1000);
+				if (pressed == 's')
+				{
+					// destroy windows
+					cv::destroyWindow("CameraSelection");
+					selectCameraCapture.release();
+					cameraId = temp;
+					break;
+				}
+				temp = (temp + 1) % numOfAvailCam;
+			}
+		}
+
+		if (errorCode != IDAP::ImageDetectionAccessPoint::ErrorCodes::OK)
+		{
+			IDAP::ImageDetectionAccessPoint::IDAPPrintError(errorCode, std::to_string(cameraId));
+			delete(access);
+			exit(1);
+		}
+		std::cout << "Camera Seleted" << std::endl;
+	}*/
 
 	// ------------------------------------- INIT CAMERA ---------------------------------------------
 	std::string path = "ARBang/Settings0.xml";
@@ -71,34 +71,34 @@ int main() {
 		delete(access);
 		exit(1);
 	}
-    // IF USING KINECT FLIP THE IMAGE ON Y AXIS
-    access->SetFlipVertically(true);
+	// IF USING KINECT FLIP THE IMAGE ON Y AXIS
+	access->SetFlipVertically(true);
 
-    // ----------------------------------- CAMERA  CALIBRATION ---------------------------------------
-    // check if camera calibration file exists, skip calibration in that case
-    if (!access->GetCameraCalibration()->LoadCameraCalib(CAMERA_CALIBRATION_FILE))
-    {
-        cv::namedWindow("CameraCalib");
-        uint16_t enoughData = 0;
-        access->GetCameraCalibration()->SetChessboardDimension(CHESSBOARD_WIDTH, CHESSBOARD_HEIGHT);
-        access->GetCameraCalibration()->SetSquareDimension(CHESSBOARD_SQUARE_SIZE);
-        access->GetCameraCalibration()->IsEnoughData(enoughData);
+	// ----------------------------------- CAMERA  CALIBRATION ---------------------------------------
+	// check if camera calibration file exists, skip calibration in that case
+	if (!access->GetCameraCalibration()->LoadCameraCalib(CAMERA_CALIBRATION_FILE))
+	{
+		cv::namedWindow("CameraCalib");
+		uint16_t enoughData = 0;
+		access->GetCameraCalibration()->SetChessboardDimension(CHESSBOARD_WIDTH, CHESSBOARD_HEIGHT);
+		access->GetCameraCalibration()->SetSquareDimension(CHESSBOARD_SQUARE_SIZE);
+		access->GetCameraCalibration()->IsEnoughData(enoughData);
 		int timeCounter = 0;
-        while (!enoughData)
-        {
-            // prepare next frame
-            access->PrepareNextFrame(errorCode);
-            if (errorCode != IDAP::ImageDetectionAccessPoint::OK)
-            {
-                IDAP::ImageDetectionAccessPoint::IDAPPrintError(errorCode, std::to_string(cameraId));
-                delete(access);
-                exit(1);
-            }
+		while (!enoughData)
+		{
+			// prepare next frame
+			access->PrepareNextFrame(errorCode);
+			if (errorCode != IDAP::ImageDetectionAccessPoint::OK)
+			{
+				IDAP::ImageDetectionAccessPoint::IDAPPrintError(errorCode, std::to_string(cameraId));
+				delete(access);
+				exit(1);
+			}
 
-            cv::imshow("CameraCalib", access->getFrame());
-            const int fps = 1000 / 25;
-            char pressed = cv::waitKey(fps);       // cca 25 fps
-			if (timeCounter >= 2000/fps)                      // 2 second between catching the image
+			cv::imshow("CameraCalib", access->getFrame());
+			const int fps = 1000 / 25;
+			char pressed = cv::waitKey(fps);       // cca 25 fps
+			if (timeCounter >= 2000 / fps)                      // 2 second between catching the image
 			{
 				access->GetCameraCalibration()->AddImageWithChessboard(access->getFrame());
 				access->GetCameraCalibration()->IsEnoughData(enoughData);
@@ -106,87 +106,94 @@ int main() {
 			}
 			else
 				timeCounter++;
-        }
-        cv::destroyWindow("CameraCalib");
-        // have enough data, calibrating
-        std::cout << "Calibration Started" << std::endl;
-        access->GetCameraCalibration()->Calibrate();
-        if (access->GetCameraCalibration()->IsErrorOccure())
-        {
-            delete(access);
-            exit(1);
-        }
-        access->GetCameraCalibration()->SaveCameraCalib(CAMERA_CALIBRATION_FILE);
-        std::cout << "Camera Calibrated" << std::endl;
-    }
+		}
+		cv::destroyWindow("CameraCalib");
+		// have enough data, calibrating
+		std::cout << "Calibration Started" << std::endl;
+		access->GetCameraCalibration()->Calibrate();
+		if (access->GetCameraCalibration()->IsErrorOccure())
+		{
+			delete(access);
+			exit(1);
+		}
+		access->GetCameraCalibration()->SaveCameraCalib(CAMERA_CALIBRATION_FILE);
+		std::cout << "Camera Calibrated" << std::endl;
+	}
 
-    // ----------------------------------- TABLE CALIBRATION - ARUCO ---------------------------------
-    //TableCalibration::CreateArucoMarkers("arUcoMarkers");
-    /*int enoughNumber = 0;
-    while (enoughNumber < 5) // 5 frames to let camera start
-    {
-        access->PrepareNextFrame(errorCode);
-        cv::waitKey(1000 / 20); // 20 fps 
-        enoughNumber++;
-    }*/
-    const cv::Mat frame = access->getFrame();
-    // detect aruco markers and show them
-    TableCalibration* tblCalib = access->GetTableCalibration();
-    
-    cv::namedWindow("CalibResult", CV_WINDOW_NORMAL);
-    // check calibration result
-    while (true)
-    {
-        // prepare next frame
-        access->PrepareNextFrame(errorCode);
-        const cv::Mat currentFrame = access->getFrame();
-        if (errorCode != IDAP::ImageDetectionAccessPoint::OK)
-        {
-            IDAP::ImageDetectionAccessPoint::IDAPPrintError(errorCode, std::to_string(cameraId));
-            delete(access);
-            exit(1);
-        }
+	// ----------------------------------- TABLE CALIBRATION - ARUCO ---------------------------------
+	//TableCalibration::CreateArucoMarkers("arUcoMarkers");
+	/*int enoughNumber = 0;
+	while (enoughNumber < 5) // 5 frames to let camera start
+	{
+		access->PrepareNextFrame(errorCode);
+		cv::waitKey(1000 / 20); // 20 fps
+		enoughNumber++;
+	}*/
+	const cv::Mat frame = access->getFrame();
+	// detect aruco markers and show them
+	TableCalibration* tblCalib = access->GetTableCalibration();
 
-        // already have four markers, don't look for them anymore
-        if (!tblCalib->HasFourPoints())
-        {
-            tblCalib->DetectMarkers(currentFrame);
-        }
-        else // we have four points, perform calibration
-        {
-            tblCalib->CalculateTableCalibrationResults(currentFrame);
-        }
+	cv::namedWindow("CalibResult", CV_WINDOW_NORMAL);
+	// check calibration result
+	while (true)
+	{
+		// prepare next frame
+		access->PrepareNextFrame(errorCode);
+		const cv::Mat currentFrame = access->getFrame();
+		if (errorCode != IDAP::ImageDetectionAccessPoint::OK)
+		{
+			IDAP::ImageDetectionAccessPoint::IDAPPrintError(errorCode, std::to_string(cameraId));
+			delete(access);
+			exit(1);
+		}
 
-        // show
-        cv::imshow("CalibResult", currentFrame);
-        const char pressed = cv::waitKey(1000 / 35);
-        if (pressed == 'q') // stop
-        {
-            break;
-        }
-        else if (pressed == 'r') // take point for table calibration again
-        {
-            tblCalib->InitTableCalibration();
-        }
-        cv::waitKey();
-    }
-    cv::destroyWindow("CalibResult");
+		// already have four markers, don't look for them anymore
+		if (!tblCalib->HasFourPoints())
+		{
+			tblCalib->DetectMarkers(currentFrame);
+		}
+		else // we have four points, perform calibration
+		{
+			tblCalib->CalculateTableCalibrationResults(currentFrame);
+		}
 
-    int i = 0;
-    cv::namedWindow("ToSave");
-    while(true)
-    {
-        access->PrepareNextFrame(errorCode);
-        std::string name = "TemplateMatchignInput/Image" + std::to_string(i++) + ".png";
+		// show
+		cv::imshow("CalibResult", currentFrame);
+		const char pressed = cv::waitKey(1000 / 35);
+		if (pressed == 'q') // stop
+		{
+			break;
+		}
+		else if (pressed == 'r') // take point for table calibration again
+		{
+			tblCalib->InitTableCalibration();
+		}
+		cv::waitKey();
+	}
+	cv::destroyWindow("CalibResult");
 
-        cv::imshow("ToSave", access->getFrame());
-        const char pressed = cv::waitKey(0);
-        if (pressed == 's')
-            cv::imwrite(name, access->getFrame());
-        else if (pressed == 'q')
-            break;
-    }
-    cv::destroyWindow("ToSave");
+	int i = 0;
+	cv::namedWindow("ToSave");
+	while (true)
+	{
+		access->PrepareNextFrame(errorCode);
+		std::string name = "TemplateMatchignInput/Image" + std::to_string(i++) + ".png";
+
+		cv::imshow("ToSave", access->getFrame());
+		const char pressed = cv::waitKey(0);
+		if (pressed == 's')
+			cv::imwrite(name, access->getFrame());
+		else if (pressed == 'q')
+			break;
+	}
+	cv::destroyWindow("ToSave");
+
+	// ------------------------------ PROJECTION CALIBRATION ---------------------
+	uint16_t chessBoardFounded = false;
+	float matrix[9]{0,0,0,0,0,0,0,0,0};
+	access->GetProjectorCalibration()->GetProjectionMatrix(chessBoardFounded, matrix, access->getFrame(), access->GetTableCalibration()->GetTableCalibrationResult());
+	std::cout << chessBoardFounded << std::endl;
+	std::cout << matrix << std::endl;
     
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------
     access->InitImageDetectionAccessPointData(errorCode, path.data(), TABLE_ID);
