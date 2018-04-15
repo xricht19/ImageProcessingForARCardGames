@@ -44,7 +44,7 @@ float TableCalibration::GetCmInPixels()
     float value = 0.f;
     for (auto &item : _markersInfos)
     {
-        value += item.second->cmInPixels;
+        value += item.second->mmInPixels;
     }
     return value / _markersInfos.size();
 }
@@ -123,7 +123,7 @@ void TableCalibration::CalculateTableCalibrationResults(cv::Mat inputImage)
         struct markerInfo* mrkrInf = new markerInfo;
         mrkrInf->ID = _markersIDs[i];
         mrkrInf->Position = _markersCorners[i][0]; // top left corner
-        mrkrInf->cmInPixels = GetCmInPixels(_markersCorners[i], MARKERS_REAL_SIZE_CENTIMETERS);
+        mrkrInf->mmInPixels = GetCmInPixels(_markersCorners[i], MARKERS_REAL_SIZE_MINIMETERS);
         // finaly push to vector
         _markersInfos.insert(std::make_pair(_markersIDs[i], mrkrInf));
     }
@@ -148,7 +148,7 @@ void TableCalibration::CalculateTableCalibrationResults(cv::Mat inputImage)
 
     // calculate projection matrix
     _tableCalibResults->perspectiveProjectionMatrix = cv::getPerspectiveTransform(projectionPointsSource, projectionPointsTarget);
-    _tableCalibResults->cmInPixels = GetCmInPixels();
+    _tableCalibResults->mmInPixels = GetCmInPixels();
     _tableCalibResults->height = maxHeight;
     _tableCalibResults->width = maxWidth;
     _calibrationDone = true;

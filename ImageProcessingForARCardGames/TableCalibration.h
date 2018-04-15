@@ -7,7 +7,7 @@
 
 #define NUMBER_OF_MARKERS_GENERATED 4 //max 50
 #define ARUCO_PREDEFINED_DICTIONARY cv::aruco::DICT_4X4_50
-#define MARKERS_REAL_SIZE_CENTIMETERS 12.4f
+#define MARKERS_REAL_SIZE_MINIMETERS 124 //real 124
 
 class TableCalibration
 {
@@ -15,7 +15,7 @@ public:
 	// table calibration final values
 	struct tableCalibrationResults
 	{
-		float cmInPixels;
+		float mmInPixels;
 		int width;
 		int height;
 		cv::Mat perspectiveProjectionMatrix;
@@ -32,7 +32,7 @@ private:
     {
         int ID;
         cv::Point Position; // first corner in corner list (top left corner)
-        float cmInPixels;
+        float mmInPixels;
     };
     std::map<int, markerInfo*> _markersInfos;
     tableCalibrationResults* _tableCalibResults;
@@ -55,7 +55,7 @@ private:
     // mean of already known sizes from separate markers
     float GetCmInPixels();
     int GetPosistionMarkerIDZero();
-    int GetInfoSize() { return _markersInfos.size(); }
+    size_t GetInfoSize() { return _markersInfos.size(); }
     // clear functions
     // delete all struct in _markersInfos map
     void ClearMarkersInfos();
@@ -71,7 +71,7 @@ public:
     
     void CalculateTableCalibrationResults(cv::Mat inputImage);
     void ApplyTableCalibrationMatrixOnInput(cv::Mat& inputImage) const;
-	tableCalibrationResults* GetTableCalibrationResult() { return _tableCalibResults; }
+	tableCalibrationResults* GetTableCalibrationResult() const { return _tableCalibResults; }
     
     static void CreateArucoMarkers(std::string path);
 };

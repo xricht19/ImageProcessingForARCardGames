@@ -7,9 +7,9 @@
 
 #define TABLE_ID 0
 #define CAMERA_CALIBRATION_FILE "IDAP_CameraCalibCoeff_kinect2"
-#define CHESSBOARD_WIDTH 6
-#define CHESSBOARD_HEIGHT 9
-#define CHESSBOARD_SQUARE_SIZE 232
+#define CHESSBOARD_WIDTH 9
+#define CHESSBOARD_HEIGHT 6
+#define CHESSBOARD_SQUARE_SIZE 23.2
 
 int main() {
 	std::cout << "StartMain" << std::endl;
@@ -189,11 +189,16 @@ int main() {
 	cv::destroyWindow("ToSave");
 
 	// ------------------------------ PROJECTION CALIBRATION ---------------------
-	uint16_t chessBoardFounded = false;
-	float matrix[9]{0,0,0,0,0,0,0,0,0};
-	access->GetProjectorCalibration()->GetProjectionMatrix(chessBoardFounded, matrix, access->getFrame(), access->GetTableCalibration()->GetTableCalibrationResult());
-	std::cout << chessBoardFounded << std::endl;
-	std::cout << matrix << std::endl;
+	double matrix[9]{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+    float size[1]{ 0.f };
+    access->GetProjectorCalibration()->SetChessboardDimension();
+	access->GetProjectorCalibration()->GetProjectionMatrix(matrix, size, access->getFrame(), access->GetTableCalibration()->GetTableCalibrationResult());
+	std::cout << "Matrix:" << std::endl;
+    for (auto &item : matrix)
+        std::cout << item << ",";
+
+    std::cout << std::endl;
+    std::cout << "Size: " << size[0] << std::endl;
     
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------
     access->InitImageDetectionAccessPointData(errorCode, path.data(), TABLE_ID);
