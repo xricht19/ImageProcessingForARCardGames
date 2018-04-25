@@ -72,7 +72,7 @@ int main() {
 		exit(1);
 	}
 	// IF USING KINECT FLIP THE IMAGE ON Y AXIS
-	access->SetFlipVertically(true);
+	access->SetFlipVertically();
 
 	// ----------------------------------- CAMERA  CALIBRATION ---------------------------------------
 	// check if camera calibration file exists, skip calibration in that case
@@ -190,7 +190,7 @@ int main() {
 
 	// ------------------------------ PROJECTION CALIBRATION ---------------------
 	double matrix[9]{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-    float size[1]{ 0.f };
+    double size = 0.0;
     access->GetProjectorCalibration()->SetChessboardDimension();
 	access->GetProjectorCalibration()->GetProjectionMatrix(matrix, size, access->getFrame(), access->GetTableCalibration()->GetTableCalibrationResult());
 	std::cout << "Matrix:" << std::endl;
@@ -198,7 +198,7 @@ int main() {
         std::cout << item << ",";
 
     std::cout << std::endl;
-    std::cout << "Size: " << size[0] << std::endl;
+    std::cout << "Size: " << size << std::endl;
     
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------
     access->InitImageDetectionAccessPointData(errorCode, path.data(), TABLE_ID);

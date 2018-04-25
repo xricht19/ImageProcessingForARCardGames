@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="VideoCaptureInterfaceCaller.h">
-      <Filter>Hlavičkové soubory</Filter>
-    </ClInclude>
     <ClInclude Include="PlayerAreaChangeDetector.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
@@ -36,11 +33,11 @@
     <ClInclude Include="ProjectorCalibration.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
+    <ClInclude Include="ImageDetectionAccessPointCaller.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="VideoCaptureInterfaceCaller.cpp">
-      <Filter>Zdrojové soubory</Filter>
-    </ClCompile>
     <ClCompile Include="PlayerAreaChangeDetector.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
@@ -60,6 +57,9 @@
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
     <ClCompile Include="ProjectorCalibration.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageDetectionAccessPointCaller.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,7 +1,7 @@
 #include "CameraCalibration.h"
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d.hpp>
-
+#include <opencv2/shape/hist_cost.hpp>
 
 
 namespace IDAP
@@ -33,6 +33,7 @@ namespace IDAP
             _errorMsg = "GetChessboardCorners -> Chessboard dimension not set.";
             return;
         }
+        int currentCount = 0;
         for (auto &item : _calibrationImages)
         {
             std::vector<cv::Point2f> pointBuf;
@@ -45,6 +46,12 @@ namespace IDAP
             if (showResult)
             {
                 cv::drawChessboardCorners(item, _chessboardDimension, pointBuf, found);
+            }
+            ++currentCount;
+            if(currentCount >= MAX_IMAGES_FOR_CALIB) 
+            {
+                // have enough, the calculation would took too long
+                break;
             }
         }
     }
@@ -204,6 +211,28 @@ namespace IDAP
         }
 
         return false;
+    }
+
+    void CameraCalibration::GetCameraCalibImage(uint16_t& errorCode, uint16_t& imgNumber, uint16_t& width, uint16_t& height,
+        uint16_t& channels, uchar* data)
+    {
+        if(imgNumber > _calibrationImages.size())
+        {
+            errorCode = UNKNOWN_IMAGE_NUMBER;
+            return;
+        }
+        cv::Mat image = _calibrationImages[imgNumber];
+        // is enough space allocated?
+        if((image.rows*image.cols*image.channels()) < width*height*channels)
+        {
+            errorCode = IMAGE_TOO_BIG;
+            return;
+        }
+        // copy data
+        cv::Mat rgbImage;
+        cv::cvtColor(image, rgbImage, CV_BGR2RGBA);
+        std::memcpy(data, rgbImage.data, rgbImage.total() * rgbImage.elemSize());
+
     }
 
     bool CameraCalibration::IsCalibrationDone() const

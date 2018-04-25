@@ -346,9 +346,9 @@ namespace IDAP
 			//dataBytes = buffer;
             //Convert from BGR to RGBA
             cv::Mat rotImg, rgbRotImg;
-            const cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(static_cast<float>(frame.cols/2), static_cast<float>(frame.rows/2)), 180, 1);
-            cv::warpAffine(frame, rotImg, rot, cv::Size(frame.cols, frame.rows));
-            cv::cvtColor(rotImg, rgbRotImg, CV_BGR2RGBA);
+            /*const cv::Mat rot = cv::getRotationMatrix2D(cv::Point2f(static_cast<float>(frame.cols/2), static_cast<float>(frame.rows/2)), 180, 1);
+            cv::warpAffine(frame, rotImg, rot, cv::Size(frame.cols, frame.rows));*/
+            cv::cvtColor(frame, rgbRotImg, CV_BGR2RGBA);
 
             std::memcpy(dataBytes, rgbRotImg.data, rgbRotImg.total() * rgbRotImg.elemSize());
 		}
@@ -419,6 +419,9 @@ namespace IDAP
 	{
 		this->usingROS = false;
 
+        if (openedStream.isOpened())
+            openedStream.release();
+
 		openedStream = cv::VideoCapture(cameraId);
         if (!openedStream.isOpened()) {
             errorCode = ErrorCodes::CANNOT_OPEN_VIDEO_STREAM;
@@ -426,7 +429,7 @@ namespace IDAP
         }
 
         // prepare structure for table calibration
-        _tableCalib = new TableCalibration();
+        //_tableCalib = new TableCalibration();
 	}
 
     void ImageDetectionAccessPoint::InitImageDetectionAccessPointData(uint16_t& errorCode, const char* settingsPath, int tableID)

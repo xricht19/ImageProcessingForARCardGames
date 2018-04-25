@@ -4,6 +4,7 @@
 #include <iostream>
 
 #define ENOUGH_IMAGES_FOR_CALIB 25
+#define MAX_IMAGES_FOR_CALIB 50
 
 namespace IDAP
 {
@@ -34,7 +35,9 @@ namespace IDAP
             OK = 0,
             NO_PARAM_FOR_CALIB_SET,
             NOT_ENOUGH_IMAGES,
-            NO_CORNERS_FOUND
+            NO_CORNERS_FOUND,
+            UNKNOWN_IMAGE_NUMBER,
+            IMAGE_TOO_BIG,
         };
 
     public:
@@ -44,7 +47,7 @@ namespace IDAP
         void AddImageWithChessboard(const cv::Mat& frame);
         void Calibrate();
 
-        /// return value > 0 if there is more than 4 image for calibration 
+        /// return value > 0 if there is more than enough image for calibration 
         void IsEnoughData(uint16_t& numberOfData) const;
 
         bool SaveCameraCalib(std::string name);
@@ -58,6 +61,9 @@ namespace IDAP
 
         bool IsErrorOccure() const { return _isError; }
         std::string GetErrorMsg() const { return _errorMsg; }
+        uint16_t GetErrorCode() const { return _errorCode; }
+
+        void GetCameraCalibImage(uint16_t& errorCode, uint16_t& imgNumber, uint16_t& width, uint16_t& height, uint16_t& channels, uchar* data);
 
         bool IsCalibrationDone() const;
     

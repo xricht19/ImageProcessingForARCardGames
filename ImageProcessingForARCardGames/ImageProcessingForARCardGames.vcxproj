@@ -25,7 +25,7 @@
     <ClInclude Include="ImageDetectionAccessPoint.h" />
     <ClInclude Include="ProjectorCalibration.h" />
     <ClInclude Include="TableCalibration.h" />
-    <ClInclude Include="VideoCaptureInterfaceCaller.h" />
+    <ClInclude Include="ImageDetectionAccessPointCaller.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraCalibration.cpp" />
@@ -35,7 +35,7 @@
     <ClCompile Include="ImageDetectionAccessPoint.cpp" />
     <ClCompile Include="ProjectorCalibration.cpp" />
     <ClCompile Include="TableCalibration.cpp" />
-    <ClCompile Include="VideoCaptureInterfaceCaller.cpp" />
+    <ClCompile Include="ImageDetectionAccessPointCaller.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

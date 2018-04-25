@@ -161,8 +161,8 @@ namespace IDAP
 
 		int errorCode;
 
-        void SetFlipHorizontally(bool value) { _flipHorizontally = value; }
-        void SetFlipVertically(bool value) { _flipVertically = value; }
+        void SetFlipHorizontally() { _flipHorizontally ? _flipHorizontally = false : _flipHorizontally = true; }
+        void SetFlipVertically() { _flipVertically ? _flipVertically = false : _flipVertically = true; }
 		
 		cv::Mat getFrame();
 		cv::Mat getSubSampledFrame();

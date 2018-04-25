@@ -76,7 +76,7 @@ ProjectorCalibration::ProjectorCalibration(): _squareDimension(0.f), _isError(fa
 {
 }
 
-void ProjectorCalibration::GetProjectionMatrix(double* output, float* sizeOut, cv::Mat inputImage, TableCalibration::tableCalibrationResults* tableCalibResult)
+bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, cv::Mat inputImage, TableCalibration::tableCalibrationResults* tableCalibResult)
 {
 	// try find corners
 	const bool founded = DetectChessboardCorners(inputImage);
@@ -87,7 +87,7 @@ void ProjectorCalibration::GetProjectionMatrix(double* output, float* sizeOut, c
 		_isError = true;
 		_errorMsg = "GetProjectionMatrix -> Cannot find all corners.";
 		// to return
-		return;
+		return false;
 	}
 
 	//std::cout << _foundedCorners << std::endl;
@@ -95,7 +95,7 @@ void ProjectorCalibration::GetProjectionMatrix(double* output, float* sizeOut, c
 	Get4CornersOfChessboard();
 	if (_isError)
 	{
-        return;
+        return false;
 	}
 
     //find transform matrix 
@@ -118,5 +118,7 @@ void ProjectorCalibration::GetProjectionMatrix(double* output, float* sizeOut, c
 	
 	// according to table setting, calculate the real size of square in chessboard
     _squareSizeMm = tableCalibResult->mmInPixels * cv::norm(_foundedCorners[0] - _foundedCorners[1]);
-    sizeOut[0] = _squareSizeMm;
+    sizeOut = _squareSizeMm;
+
+    return true;
 }
