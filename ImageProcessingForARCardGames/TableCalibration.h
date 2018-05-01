@@ -51,9 +51,9 @@ private:
     };
 
     // calculate real size from four points in image and real size
-    float GetCmInPixels(std::vector<cv::Point2f> points, float realSize);
+    float GetMmInPixels(std::vector<cv::Point2f> points, float realSize);
     // mean of already known sizes from separate markers
-    float GetCmInPixels();
+    float GetMmInPixels();
     int GetPosistionMarkerIDZero();
     size_t GetInfoSize() { return _markersInfos.size(); }
     // clear functions

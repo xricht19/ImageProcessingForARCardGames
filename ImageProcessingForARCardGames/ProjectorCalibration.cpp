@@ -83,7 +83,7 @@ bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, 
 	if (!founded)
 	{
 		// set error
-		_errorCode = 3;
+		_errorCode = 403;
 		_isError = true;
 		_errorMsg = "GetProjectionMatrix -> Cannot find all corners.";
 		// to return

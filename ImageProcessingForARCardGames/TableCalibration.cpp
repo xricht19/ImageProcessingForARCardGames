@@ -26,7 +26,7 @@ void TableCalibration::ClearMarkersInfos()
 
 
 
-float TableCalibration::GetCmInPixels(std::vector<cv::Point2f> points, float realSize)
+float TableCalibration::GetMmInPixels(std::vector<cv::Point2f> points, float realSize)
 {
     float distance = 0;
     const int numOfElem = points.size();
@@ -36,10 +36,10 @@ float TableCalibration::GetCmInPixels(std::vector<cv::Point2f> points, float rea
         const int i_1 = (i + 1) % numOfElem;
         distance += cv::norm(points[i] - points[i_1]);
     }
-    return (distance / static_cast<float>(numOfElem))/realSize;
+    return realSize/ (distance / static_cast<float>(numOfElem));
 }
 
-float TableCalibration::GetCmInPixels()
+float TableCalibration::GetMmInPixels()
 {
     float value = 0.f;
     for (auto &item : _markersInfos)
@@ -111,7 +111,8 @@ void TableCalibration::DetectMarkers(cv::Mat inputImage)
     detectorParams->errorCorrectionRate = 0.6;*/
 
     cv::aruco::detectMarkers(inputImage, markerDictionary, _markersCorners, _markersIDs, detectorParams, _rejectedCandidates);
-    cv::aruco::drawDetectedMarkers(inputImage, _markersCorners, _markersIDs, cv::Scalar(0, 0, 255));
+	if(HasFourPoints())
+		cv::aruco::drawDetectedMarkers(inputImage, _markersCorners, _markersIDs, cv::Scalar(0, 0, 255));
 }
 
 
@@ -123,7 +124,7 @@ void TableCalibration::CalculateTableCalibrationResults(cv::Mat inputImage)
         struct markerInfo* mrkrInf = new markerInfo;
         mrkrInf->ID = _markersIDs[i];
         mrkrInf->Position = _markersCorners[i][0]; // top left corner
-        mrkrInf->mmInPixels = GetCmInPixels(_markersCorners[i], MARKERS_REAL_SIZE_MINIMETERS);
+        mrkrInf->mmInPixels = GetMmInPixels(_markersCorners[i], MARKERS_REAL_SIZE_MINIMETERS);
         // finaly push to vector
         _markersInfos.insert(std::make_pair(_markersIDs[i], mrkrInf));
     }
@@ -148,7 +149,7 @@ void TableCalibration::CalculateTableCalibrationResults(cv::Mat inputImage)
 
     // calculate projection matrix
     _tableCalibResults->perspectiveProjectionMatrix = cv::getPerspectiveTransform(projectionPointsSource, projectionPointsTarget);
-    _tableCalibResults->mmInPixels = GetCmInPixels();
+    _tableCalibResults->mmInPixels = GetMmInPixels();
     _tableCalibResults->height = maxHeight;
     _tableCalibResults->width = maxWidth;
     _calibrationDone = true;

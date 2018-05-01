@@ -18,24 +18,30 @@ int main() {
 
 	uint16_t errorCode = 0;
 	uint16_t cameraId = 0;
+	std::cout << "Size of 16 doubles: " << sizeof(double) * 16 << std::endl;
 	// get list of all cameras ----------- CAMERA SELECTION ------------------------------------------
-	/*{
+	{
 		uint16_t numOfAvailCam;
 		IDAP::ImageDetectionAccessPoint::GetNumberOfAllAvailableDevices(errorCode, numOfAvailCam);
 		if (errorCode == IDAP::ImageDetectionAccessPoint::ErrorCodes::OK)
 		{
 			// list all devices in loop
 			int temp = 0;
+			int lastOpened = -1;
 			cv::Mat frame;
 			cv::namedWindow("CameraSelection");
+			cv::VideoCapture selectCameraCapture;
 			while (true)
 			{
 				// open stream for camera
-				cv::VideoCapture selectCameraCapture = cv::VideoCapture(temp);
-				if (!selectCameraCapture.isOpened()) {
-					errorCode = IDAP::ImageDetectionAccessPoint::ErrorCodes::CANNOT_OPEN_VIDEO_STREAM;
-					break;
-				}
+				if (temp != lastOpened)	{
+					selectCameraCapture = cv::VideoCapture(temp);
+					if (!selectCameraCapture.isOpened()) {
+						errorCode = IDAP::ImageDetectionAccessPoint::ErrorCodes::CANNOT_OPEN_VIDEO_STREAM;
+						break;
+					}
+					lastOpened = temp;
+				}				
 				selectCameraCapture >> frame;
 				const cv::Size newFrSize = cv::Size(500, frame.rows*(500.0 / static_cast<float>(frame.cols)));
 				cv::resize(frame, frame, newFrSize);
@@ -60,7 +66,7 @@ int main() {
 			exit(1);
 		}
 		std::cout << "Camera Seleted" << std::endl;
-	}*/
+	}
 
 	// ------------------------------------- INIT CAMERA ---------------------------------------------
 	std::string path = "ARBang/Settings0.xml";
@@ -72,7 +78,7 @@ int main() {
 		exit(1);
 	}
 	// IF USING KINECT FLIP THE IMAGE ON Y AXIS
-	access->SetFlipVertically();
+	//access->SetFlipVertically();
 
 	// ----------------------------------- CAMERA  CALIBRATION ---------------------------------------
 	// check if camera calibration file exists, skip calibration in that case
@@ -188,17 +194,26 @@ int main() {
 	}
 	cv::destroyWindow("ToSave");
 
+	std::cout << "mmInPixels: " << access->GetTableCalibration()->GetTableCalibrationResult()->mmInPixels << std::endl;
+
 	// ------------------------------ PROJECTION CALIBRATION ---------------------
-	double matrix[9]{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+	double* matrix = new double[9]{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
     double size = 0.0;
     access->GetProjectorCalibration()->SetChessboardDimension();
-	access->GetProjectorCalibration()->GetProjectionMatrix(matrix, size, access->getFrame(), access->GetTableCalibration()->GetTableCalibrationResult());
-	std::cout << "Matrix:" << std::endl;
-    for (auto &item : matrix)
-        std::cout << item << ",";
+	bool success = access->GetProjectorCalibration()->GetProjectionMatrix(matrix, size, access->getFrame(), access->GetTableCalibration()->GetTableCalibrationResult());
+	if (success)
+	{
+		std::cout << "Matrix:" << std::endl;
+		for (int i = 0; i < 9; ++i)
+			std::cout << matrix[i] << ",";
 
-    std::cout << std::endl;
-    std::cout << "Size: " << size << std::endl;
+		std::cout << std::endl;
+		std::cout << "Size: " << size << std::endl;
+	}
+	else
+	{
+		std::cout << "Cannot find chessboard." << std::endl;
+	}
     
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------
     access->InitImageDetectionAccessPointData(errorCode, path.data(), TABLE_ID);

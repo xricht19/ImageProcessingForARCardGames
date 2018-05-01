@@ -141,7 +141,10 @@ namespace IDAP
     void DetectMarkersCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode)
     {
         instance->GetTableCalibration()->DetectMarkers(instance->getFrame());
-        errorCode = 0;
+		if (instance->GetTableCalibration()->HasFourPoints())
+			errorCode = 0;
+		else
+			errorCode = 401;
     }
 
     void CalculateTableCalibrationResultCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode)
@@ -159,7 +162,7 @@ namespace IDAP
         }
         else
         {
-            errorCode = 401;
+            errorCode = 402;
         }
     }
 
