@@ -44,6 +44,6 @@ namespace IDAP
         extern DllExport void DetectMarkersCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode);
         extern DllExport void CalculateTableCalibrationResultCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode);
         extern DllExport void SetChessboardDimensionProjectionCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& width, uint16_t& height);
-        extern DllExport void GetProjectionTranformMatrixCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& dataSizeAvailable, double &cmInPixels, double* data);
+        extern DllExport void GetProjectionTranformMatrixCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& dataSizeAvailable, double &cmInPixels, double* data, double* tableCorners);
 	}
 }

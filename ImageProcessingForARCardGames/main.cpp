@@ -197,10 +197,11 @@ int main() {
 	std::cout << "mmInPixels: " << access->GetTableCalibration()->GetTableCalibrationResult()->mmInPixels << std::endl;
 
 	// ------------------------------ PROJECTION CALIBRATION ---------------------
-	double* matrix = new double[9]{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+	double* matrix = new double[9]{ 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
     double size = 0.0;
+	double* tableValues = new double[4]{ 0.0,0.0,0.0,0.0 };
     access->GetProjectorCalibration()->SetChessboardDimension();
-	bool success = access->GetProjectorCalibration()->GetProjectionMatrix(matrix, size, access->getFrame(), access->GetTableCalibration()->GetTableCalibrationResult());
+	bool success = access->GetProjectorCalibration()->GetProjectionMatrix(matrix, size, tableValues, access->getFrame(), access->GetTableCalibration()->GetTableCalibrationResult());
 	if (success)
 	{
 		std::cout << "Matrix:" << std::endl;
@@ -209,11 +210,17 @@ int main() {
 
 		std::cout << std::endl;
 		std::cout << "Size: " << size << std::endl;
+		
+		std::cout << "Table dimensions: " << std::endl;
+		for (int i = 0; i < 4; ++i)
+			std::cout << tableValues[i] << ", ";
 	}
 	else
 	{
 		std::cout << "Cannot find chessboard." << std::endl;
 	}
+	cv::namedWindow("center");
+	cv::imshow("center", access->getFrame());
     
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------
     access->InitImageDetectionAccessPointData(errorCode, path.data(), TABLE_ID);

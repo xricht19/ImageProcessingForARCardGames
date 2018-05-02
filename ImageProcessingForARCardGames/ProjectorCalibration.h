@@ -22,6 +22,7 @@ private:
     std::vector<cv::Point2f> _projectionPointsTarget;
 
     // results
+	cv::Point2f _topLeftDetectableChessboardCorner;
     cv::Mat _inversePerspectiveMatrix;
     float _squareSizeMm;
 
@@ -45,7 +46,7 @@ public:
     ProjectorCalibration();
     ~ProjectorCalibration() = default;
 
-    bool GetProjectionMatrix(double* output, double& sizeOut, cv::Mat inputImage, TableCalibration::tableCalibrationResults* tableCalibResult);
+    bool GetProjectionMatrix(double* output, double& sizeOut, double* tableCorners, cv::Mat inputImage, TableCalibration::tableCalibrationResults* tableCalibResult);
 
     void SetSquareDimension(float value) { _squareDimension = 1000 * value; /* to meters, must be calculate usign data from table calibration */ }
     void SetChessboardDimension(int width = CHESSBOARD_WIDTH_PROJ, int height = CHESSBOARD_HEIGHT_PROJ) { _chessboardDimension = cv::Size(width, height); } // fixed size according to chessboard sprite in unity

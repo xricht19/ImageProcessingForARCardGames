@@ -53,8 +53,9 @@ void ProjectorCalibration::Get4CornersOfChessboard()
 	}
 
     // offset settings
-    const int offsetX = topLeft.x;
-    const int offsetY = topLeft.y;
+	float distance = static_cast<float>(cv::norm(topLeft - cv::Point2f(0,0)));
+    const float offsetX = distance;
+    const float offsetY = distance;
 
 	// calculate the desired values of points
     const float maxWidth = static_cast<float>(MAX(cv::norm(bottomRight - bottomLeft),
@@ -72,11 +73,11 @@ void ProjectorCalibration::Get4CornersOfChessboard()
 
 }
 
-ProjectorCalibration::ProjectorCalibration(): _squareDimension(0.f), _isError(false), _errorCode(0)
+ProjectorCalibration::ProjectorCalibration() : _squareDimension(0.f), _isError(false), _errorCode(0), _topLeftDetectableChessboardCorner(0.0, 0.0)
 {
 }
 
-bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, cv::Mat inputImage, TableCalibration::tableCalibrationResults* tableCalibResult)
+bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, double* tableCorners, cv::Mat inputImage, TableCalibration::tableCalibrationResults* tableCalibResult)
 {
 	// try find corners
 	const bool founded = DetectChessboardCorners(inputImage);
@@ -90,13 +91,21 @@ bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, 
 		return false;
 	}
 
-	//std::cout << _foundedCorners << std::endl;
 	// corners found, try to get four corresponding points
 	Get4CornersOfChessboard();
 	if (_isError)
 	{
         return false;
 	}
+	// find left bottom corner of matrix
+	_topLeftDetectableChessboardCorner = _foundedCorners[0];
+	/*cv::Point2f bottomRightCorner = _foundedCorners[_foundedCorners.size() - 1];
+	std::cout << "NumOfFoundedCorners: " << _foundedCorners.size() << std::endl;
+	cv::Point2f chessboardCenter = (leftTopCorner + bottomRightCorner) * 0.5;
+	std::cout << "chessCenter: " << chessboardCenter.x << ", " << chessboardCenter.y;
+	cv::rectangle(inputImage, cv::Rect(leftTopCorner.x, leftTopCorner.y, 2, 2), cv::Scalar(255,0,0));
+	cv::rectangle(inputImage, cv::Rect(bottomRightCorner.x, bottomRightCorner.y, 2, 2), cv::Scalar(255, 0, 0));
+	cv::rectangle(inputImage, cv::Rect(chessboardCenter.x, chessboardCenter.y, 2, 2), cv::Scalar(0, 0, 255));*/
 
     //find transform matrix 
     const cv::Mat proj = cv::getPerspectiveTransform(_projectionPointsOrigin, _projectionPointsTarget);
@@ -110,15 +119,36 @@ bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, 
     cv::Mat out;
     cv::warpPerspective(inputImage, out, proj, cv::Size(inputImage.cols, inputImage.rows));
     cv::imshow("corners", out);*/
+
+
     _inversePerspectiveMatrix = proj.inv();
     // copy to output
     for(auto i=0; i < 3; ++i)
         for(auto j=0; j < 3; ++j)        
             output[3*i + j] = _inversePerspectiveMatrix.at<double>(i,j);
+
+
+	/*cv::Mat temp;
+	cv::warpPerspective(inputImage, temp, _inversePerspectiveMatrix, cv::Size(2 * inputImage.cols, 2 * inputImage.rows));
+
+	cv::imshow("inv", temp);*/
 	
 	// according to table setting, calculate the real size of square in chessboard
-    _squareSizeMm = tableCalibResult->mmInPixels * cv::norm(_foundedCorners[0] - _foundedCorners[1]);
+    _squareSizeMm = static_cast<float>(tableCalibResult->mmInPixels * cv::norm(_foundedCorners[0] - _foundedCorners[1]));
     sizeOut = _squareSizeMm;
 
+	// calculate the size of table for projector, the common known point is one corner of chessboard
+	double width = static_cast<double>(inputImage.cols);
+	double height = static_cast<double>(inputImage.rows);
+	tableCorners[0] = -_foundedCorners[0].x;			// x1 -> top left
+	tableCorners[1] = -_foundedCorners[0].y;			// y1
+	tableCorners[2] = width;
+	tableCorners[3] = height;
+	/*tableCorners[2] = -_foundedCorners[0].x;			// x2 -> bottom left
+	tableCorners[3] = height - _foundedCorners[0].y;	// y2
+	tableCorners[4] = width - _foundedCorners[0].x;		// x3 -> bottom right
+	tableCorners[5] = height - _foundedCorners[0].y;	// y3
+	tableCorners[6] = width - _foundedCorners[0].x;		// x4 -> top right
+	tableCorners[7] = -_foundedCorners[0].y;			// y4*/
     return true;
 }

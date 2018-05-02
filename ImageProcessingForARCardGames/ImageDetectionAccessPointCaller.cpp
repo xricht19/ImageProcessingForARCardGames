@@ -153,9 +153,9 @@ namespace IDAP
     }
 
     void GetProjectionTranformMatrixCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode,
-        uint16_t& dataSizeAvailable, double& cmInPixels, double* data)
+        uint16_t& dataSizeAvailable, double& cmInPixels, double* data, double* tableCorners)
     {
-        const bool success = instance->GetProjectorCalibration()->GetProjectionMatrix(data, cmInPixels, instance->getFrame(), instance->GetTableCalibration()->GetTableCalibrationResult());
+        const bool success = instance->GetProjectorCalibration()->GetProjectionMatrix(data, cmInPixels, tableCorners, instance->getFrame(), instance->GetTableCalibration()->GetTableCalibrationResult());
         if(success)
         {
             errorCode = 0;
