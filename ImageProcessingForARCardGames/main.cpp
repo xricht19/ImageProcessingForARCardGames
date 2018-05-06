@@ -4,6 +4,7 @@
 #include <opencv2\highgui\highgui.hpp>
 #include <opencv2\opencv.hpp>
 #include "CameraCalibration.h"
+#include "ImageDetectionAccessPointCaller.h"
 
 #define TABLE_ID 0
 #define CAMERA_CALIBRATION_FILE "IDAP_CameraCalibCoeff_kinect2"
@@ -78,7 +79,7 @@ int main() {
 		exit(1);
 	}
 	// IF USING KINECT FLIP THE IMAGE ON Y AXIS
-	//access->SetFlipVertically();
+	access->SetFlipVertically();
 
 	// ----------------------------------- CAMERA  CALIBRATION ---------------------------------------
 	// check if camera calibration file exists, skip calibration in that case
@@ -200,16 +201,24 @@ int main() {
 	double* matrix = new double[9]{ 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
     double size = 0.0;
 	double* tableValues = new double[4]{ 0.0,0.0,0.0,0.0 };
-    access->GetProjectorCalibration()->SetChessboardDimension();
-	bool success = access->GetProjectorCalibration()->GetProjectionMatrix(matrix, size, tableValues, access->getFrame(), access->GetTableCalibration()->GetTableCalibrationResult());
-	if (success)
+    access->PrepareNextFrame(errorCode);
+    //access->GetProjectorCalibration()->SetChessboardDimension();
+    uint16_t errorCode3 = 0;
+    uint16_t width = 9, height = 6;
+    IDAP::SetChessboardDimensionProjectionCaller(access, errorCode3, width, height);
+    //bool success = access->GetProjectorCalibration()->GetProjectionMatrix(matrix, size, tableValues, access->getFrame(), access->GetTableCalibration()->GetTableCalibrationResult());
+    if (errorCode3 != 0)
+        std::cout << "SET error with IDAP use!\n";
+    uint16_t datAvail = 9;
+    IDAP::GetProjectionTranformMatrixCaller(access, errorCode3, datAvail, size, matrix, tableValues);
+	if (errorCode3 == 0)
 	{
 		std::cout << "Matrix:" << std::endl;
 		for (int i = 0; i < 9; ++i)
 			std::cout << matrix[i] << ",";
 
 		std::cout << std::endl;
-		std::cout << "Size: " << size << std::endl;
+		std::cout << "square Size: " << size << std::endl;
 		
 		std::cout << "Table dimensions: " << std::endl;
 		for (int i = 0; i < 4; ++i)
@@ -217,13 +226,13 @@ int main() {
 	}
 	else
 	{
-		std::cout << "Cannot find chessboard." << std::endl;
+		std::cout << "Cannot find chessboard. " << errorCode3 << std::endl;
 	}
 	cv::namedWindow("center");
 	cv::imshow("center", access->getFrame());
     
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------
-    access->InitImageDetectionAccessPointData(errorCode, path.data(), TABLE_ID);
+    access->InitImageDetectionAccessPointDataAndDetection(errorCode, TABLE_ID);
 
 	std::cout << "Loading Game Card Data" << std::endl;
     access->LoadCardData("ARBang/gameCardData");
@@ -249,11 +258,11 @@ int main() {
 		access->PrepareNextFrame(errorCode);
 		cv::imshow("Current", access->getSubSampledFrame());
 		// for all players, check if area is active
-		uint16_t isActive;
+		double isActive;
 		for (uint16_t i = 1; i < access->GetNumberOfPlayers() + 1; i++)
 		{
 			access->IsPlayerActiveByID(errorCode, i, isActive);
-			if (isActive)
+			if (isActive > 0)
 			{
 				std::cout << "Player: " << i << " is ACTIVE!" << std::endl;
 			}

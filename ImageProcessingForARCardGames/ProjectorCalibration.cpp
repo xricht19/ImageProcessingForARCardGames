@@ -21,13 +21,10 @@ bool ProjectorCalibration::DetectChessboardCorners(cv::Mat image)
 		_foundedCorners = pointBuf;
 		return true;
 	}
-    else
-    {
-        _isError = true;
-        _errorCode = NO_ALL_CORNERS_FOUND;
-        _errorMsg = "GetChessboardCorners -> Not all corners found";
-    }
 
+    _isError = true;
+    _errorCode = NO_ALL_CORNERS_FOUND;
+    _errorMsg = "GetChessboardCorners -> Not all corners found";
 	return false;
 }
 
@@ -79,12 +76,20 @@ ProjectorCalibration::ProjectorCalibration() : _squareDimension(0.f), _isError(f
 
 bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, double* tableCorners, cv::Mat inputImage, TableCalibration::tableCalibrationResults* tableCalibResult)
 {
+    // try thresholding to better view matrix
+    /*cv::Mat greyed;
+    cv::cvtColor(inputImage, greyed, CV_BGR2GRAY);
+    //cv::adaptiveThreshold(greyed, greyed, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 11, 2);
+    cv::threshold(greyed, greyed, 0, 255, CV_THRESH_OTSU);
+    cv::imshow("thresh", greyed);
+    */
+    cv::imwrite("ChessboardDetection.png", inputImage);
 	// try find corners
 	const bool founded = DetectChessboardCorners(inputImage);
 	if (!founded)
 	{
 		// set error
-		_errorCode = 403;
+		_errorCode = NO_ALL_CORNERS_FOUND;
 		_isError = true;
 		_errorMsg = "GetProjectionMatrix -> Cannot find all corners.";
 		// to return

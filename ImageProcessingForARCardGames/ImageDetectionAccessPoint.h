@@ -16,6 +16,8 @@
 #include "rapidxml-1.13\rapidxml.hpp"
 #include "rapidxml-1.13\rapidxml_utils.hpp"
 
+#define GAME_DATA_PATH "Assets/ARBang/Settings0.xml"
+
 
 namespace IDAP
 {
@@ -134,16 +136,16 @@ namespace IDAP
             CANNOT_OPEN_VIDEO_STREAM,
             VIDEO_STREAM_IS_NOT_OPENED,
             CANNOT_GET_IMAGE_FROM_CAMERA,
-            CONNECTION_TO_ROS_IS_AVAILABLE_ONLY_ON_WINDOWS,
             FRAME_WAS_NOT_READ,
-            CANNOT_LOAD_SETTINGS_FROM_XML,
+
+            CANNOT_LOAD_SETTINGS_FROM_XML = 501,
         };
 
 		static void GetNumberOfAllAvailableDevices(uint16_t&, uint16_t&);
         static void IDAPPrintError(uint16_t errorCode, std::string data = "");
 
 		void InitImageDetectionAccessPointCamera(uint16_t&, uint16_t&);
-        void InitImageDetectionAccessPointData(uint16_t&, const char*, int);
+        void InitImageDetectionAccessPointDataAndDetection(uint16_t&, int);
 		void InitImageDetectionAccessPointROS(uint16_t&, uchar*, uint16_t&, const char*&);
 		void GetVideoResolution(uint16_t&, uint16_t&, uint16_t&);
 		// load cards data
@@ -152,7 +154,7 @@ namespace IDAP
 		void PrepareNextFrame(uint16_t&);
 		void GetCurrentFrameSize(uint16_t&, uint16_t&, uint16_t&, uint16_t&);
 		void GetCurrentFrameData(uint16_t&, uint16_t&, uint16_t&, uint16_t&, uchar*);
-		void IsPlayerActiveByID(uint16_t&, uint16_t&, uint16_t&);
+		void IsPlayerActiveByID(uint16_t&, uint16_t&, double&);
 		void IsCardChangedByID(uint16_t&, uint16_t&, uint16_t&);
 
 		std::map<std::string, cv::Mat>* GetGameCardData();

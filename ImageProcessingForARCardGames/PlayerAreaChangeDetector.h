@@ -18,7 +18,7 @@ namespace IDAP
 		PlayerAreaActiveDetector(int _playerID, int _areaX, int _areaY, int _width, int _height);
 		~PlayerAreaActiveDetector();
 
-		bool isAreaActive(cv::Mat currentFrame);
+		double isAreaActive(cv::Mat currentFrame);
 
 	private:
 		int playerID;

@@ -20,7 +20,7 @@ namespace IDAP
 		backSub.release();
 	}
 
-	bool PlayerAreaActiveDetector::isAreaActive(cv::Mat currentFrame)
+	double PlayerAreaActiveDetector::isAreaActive(cv::Mat currentFrame)
 	{
 		// cut area from currenFrame
 		cv::Mat area = currentFrame(roi);
@@ -33,12 +33,12 @@ namespace IDAP
 		// check if the value is high enough and if it already drop down from last time
 		if (value > UPPER_THRESHOLD && initState) {
 			initState = false;
-			return true;
+			return value;
 		}
 		else if (value < LOWER_THRESHOLD) {
 			initState = true;
 		}
 
-		return false;
+		return -1.0;
 	}
 }

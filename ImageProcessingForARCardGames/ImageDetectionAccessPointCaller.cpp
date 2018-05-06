@@ -26,8 +26,8 @@ namespace IDAP
         instance->InitImageDetectionAccessPointCamera(errorCode, cameraId);
     }
 
-    void InitImageDetectionAccessPointDataCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, const char* path, uint16_t tableID) {
-        instance->InitImageDetectionAccessPointData(errorCode, path, tableID);
+    void InitImageDetectionAccessPointDataAndDetectionCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& tableID) {
+        instance->InitImageDetectionAccessPointDataAndDetection(errorCode, tableID);
     }
 
     void InitImageDetectionAccessPointROSCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uchar* ipAdress, uint16_t& port, const char* path) {
@@ -50,8 +50,8 @@ namespace IDAP
         instance->GetCurrentFrameData(errorCode, rows, columns, channels, dataBytes);
     }
 
-    void IsPlayerActiveByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& playerID, uint16_t &isActive) {
-        instance->IsPlayerActiveByID(errorCode, playerID, isActive);
+    void IsPlayerActiveByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& playerID, double& intensity) {
+        instance->IsPlayerActiveByID(errorCode, playerID, intensity);
     }
 
     void IsCardChangedByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& positionID, uint16_t& cardID) {
@@ -162,7 +162,7 @@ namespace IDAP
         }
         else
         {
-            errorCode = 402;
+            errorCode = instance->GetProjectorCalibration()->GetErrorCode();
         }
     }
 

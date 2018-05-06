@@ -3,6 +3,10 @@
 	<ARBangTableSettings id="0">
 		<CentralArea start_x="40" start_y="70" width="60" height="100" />
 		<Players numberOf="4">
+			<Player id="0">
+				<!-- Player with id 0 is settings for whole table and contain cetral area with packs of cards -->
+				<ActiveArea start_x="0" start_y="0" width="100" height="100" />
+			</Player>
 			<Player id="1">
 				<ActiveArea start_x="0" start_y="0" width="20" height="20" />
 			</Player>

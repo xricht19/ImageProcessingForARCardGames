@@ -37,9 +37,9 @@ private:
     enum ErrorStates
     {
         OK = 0,
-        NO_PARAM_FOR_CALIB_SET,
-        NO_ALL_CORNERS_FOUND,
-		NO_DIFFERENT_CORNERS_FOUND
+        NO_PARAM_FOR_CALIB_SET = 405,
+        NO_ALL_CORNERS_FOUND = 404,
+		NO_DIFFERENT_CORNERS_FOUND = 407
     };
 
 public:
@@ -47,6 +47,8 @@ public:
     ~ProjectorCalibration() = default;
 
     bool GetProjectionMatrix(double* output, double& sizeOut, double* tableCorners, cv::Mat inputImage, TableCalibration::tableCalibrationResults* tableCalibResult);
+
+    int GetErrorCode() const { return _errorCode; }
 
     void SetSquareDimension(float value) { _squareDimension = 1000 * value; /* to meters, must be calculate usign data from table calibration */ }
     void SetChessboardDimension(int width = CHESSBOARD_WIDTH_PROJ, int height = CHESSBOARD_HEIGHT_PROJ) { _chessboardDimension = cv::Size(width, height); } // fixed size according to chessboard sprite in unity

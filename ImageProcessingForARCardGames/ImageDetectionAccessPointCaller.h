@@ -17,7 +17,7 @@ namespace IDAP
 
 		extern DllExport void GetNumberOfAllAvailableDevicesCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&);
 		extern DllExport void InitImageDetectionAccessPointCameraCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&);
-        extern DllExport void InitImageDetectionAccessPointDataCaller(ImageDetectionAccessPoint*, uint16_t&, const char*, uint16_t);
+        extern DllExport void InitImageDetectionAccessPointDataAndDetectionCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& tableID);
 		extern DllExport void InitImageDetectionAccessPointROSCaller(ImageDetectionAccessPoint*, uint16_t&, uchar*, uint16_t&);
 		extern DllExport void GetVideoResolutionCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, uint16_t&);
         extern DllExport void SetFlipHorizontallyCaller(ImageDetectionAccessPoint*, uint16_t&);
@@ -26,7 +26,7 @@ namespace IDAP
 		extern DllExport void PrepareNextFrameCaller(ImageDetectionAccessPoint*, uint16_t&);
 		extern DllExport void GetCurrentFrameSizeCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, uint16_t&, uint16_t&);
 		extern DllExport void GetCurrentFrameDataCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, uint16_t&, uint16_t&, uchar*);
-		extern DllExport void IsPlayerActiveByIDCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, uint16_t&);
+		extern DllExport void IsPlayerActiveByIDCaller(ImageDetectionAccessPoint*, uint16_t&, uint16_t&, double& intensity);
 		extern DllExport void IsCardChangedByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& positionID, uint16_t& cardID);
 
         // calibrate camera functions
