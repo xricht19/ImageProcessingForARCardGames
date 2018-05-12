@@ -22,7 +22,7 @@ int main() {
 	std::cout << "Size of 16 doubles: " << sizeof(double) * 16 << std::endl;
 	// get list of all cameras ----------- CAMERA SELECTION ------------------------------------------
 	{
-		uint16_t numOfAvailCam;
+		/*uint16_t numOfAvailCam;
 		IDAP::ImageDetectionAccessPoint::GetNumberOfAllAvailableDevices(errorCode, numOfAvailCam);
 		if (errorCode == IDAP::ImageDetectionAccessPoint::ErrorCodes::OK)
 		{
@@ -66,7 +66,7 @@ int main() {
 			delete(access);
 			exit(1);
 		}
-		std::cout << "Camera Seleted" << std::endl;
+		std::cout << "Camera Seleted" << std::endl;*/
 	}
 
 	// ------------------------------------- INIT CAMERA ---------------------------------------------
@@ -253,20 +253,24 @@ int main() {
 
 	while (true)
 	{
-		char pressed = cv::waitKey(1);
+		char pressed = cv::waitKey(40);
 		// get next frame from camera
 		access->PrepareNextFrame(errorCode);
 		cv::imshow("Current", access->getSubSampledFrame());
 		// for all players, check if area is active
 		double isActive;
-		for (uint16_t i = 1; i < access->GetNumberOfPlayers() + 1; i++)
+        bool active = false;
+		for (uint16_t i = 1; i < access->GetNumberOfPlayers() + 1; ++i)
 		{
 			access->IsPlayerActiveByID(errorCode, i, isActive);
 			if (isActive > 0)
 			{
-				std::cout << "Player: " << i << " is ACTIVE!" << std::endl;
+				std::cout << "Player: " << i << " is ACTIVE with intensity: " << isActive << std::endl;
+                active = true;
 			}
 		}
+        if(active)
+            std::cout << "----------------\n";
 		// TO-DO: CHECK IF CARD HAS CHANGED
 		
 		// check card if c pressed

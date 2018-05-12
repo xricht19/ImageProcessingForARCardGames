@@ -24,7 +24,7 @@ private:
     // results
 	cv::Point2f _topLeftDetectableChessboardCorner;
     cv::Mat _inversePerspectiveMatrix;
-    float _squareSizeMm;
+    double _squareSizeMm;
 
     // error
     bool _isError;
@@ -32,7 +32,7 @@ private:
     std::string _errorMsg;
 
     bool DetectChessboardCorners(cv::Mat image);
-    void Get4CornersOfChessboard();
+    void Get4CornersOfChessboard(cv::Size imageSize);
 
     enum ErrorStates
     {

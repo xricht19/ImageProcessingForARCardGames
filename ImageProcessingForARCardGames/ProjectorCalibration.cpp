@@ -28,17 +28,58 @@ bool ProjectorCalibration::DetectChessboardCorners(cv::Mat image)
 	return false;
 }
 
-void ProjectorCalibration::Get4CornersOfChessboard()
+void ProjectorCalibration::Get4CornersOfChessboard(cv::Size imageSize)
 {
 	// looking for extremes - corners sorted row by row, left to right
-	// 1. min(x), min(y)
-	cv::Point2f bottomLeft = _foundedCorners[_chessboardDimension.width*(_chessboardDimension.height-1)];
-	// 2. min(x), max(y)
-	cv::Point2f topLeft = _foundedCorners[0];
-	// 3. max(x), min(y)
-	cv::Point2f bottomRight = _foundedCorners[_chessboardDimension.width*_chessboardDimension.height-1];
-	// 4. max(x), max(y)
-	cv::Point2f topRight = _foundedCorners[_chessboardDimension.width-1];
+    std::vector<cv::Point2f> corners;
+	corners.push_back(_foundedCorners[_chessboardDimension.width*(_chessboardDimension.height-1)]);
+    corners.push_back(_foundedCorners[0]);
+    corners.push_back(_foundedCorners[_chessboardDimension.width*_chessboardDimension.height-1]);
+    corners.push_back(_foundedCorners[_chessboardDimension.width-1]);
+
+    // set the worst possible
+    cv::Point2f topLeft = cv::Point2f(imageSize.width, imageSize.height); // distance to (0, 0)
+    cv::Point2f bottomLeft = cv::Point2f(imageSize.width, 0.f); // distance to (0, height)
+    cv::Point2f bottomRight = cv::Point2f(0.f, 0.f); // distance to (width, height)
+    cv::Point2f topRight = cv::Point2f(0.f, imageSize.height);   // distance to (width, 0)
+    // calculate distances
+    float TLDistance = static_cast<float>(cv::norm(topLeft - cv::Point2f(0.f, 0.f)));
+    float BLDistance = static_cast<float>(cv::norm(bottomLeft - cv::Point2f(0.f, imageSize.height)));
+    float BRDistance = static_cast<float>(cv::norm(bottomRight - cv::Point2f(imageSize.width, imageSize.height)));
+    float TRDistance = static_cast<float>(cv::norm(topRight - cv::Point2f(imageSize.width, 0.f)));
+
+    for(std::vector<cv::Point2f>::iterator it = corners.begin(); it != corners.end(); ++it)
+    {
+        float TLDistanceCurr = static_cast<float>(cv::norm((*it) - cv::Point2f(0.f,0.f)));
+        float BLDistanceCurr = static_cast<float>(cv::norm((*it) - cv::Point2f(0.f, imageSize.height)));
+        float BRDistanceCurr = static_cast<float>(cv::norm((*it) - cv::Point2f(imageSize.width, imageSize.height)));
+        float TRDistanceCurr = static_cast<float>(cv::norm((*it) - cv::Point2f(imageSize.width, 0.f)));
+        // topLeft
+        if(TLDistanceCurr < TLDistance)
+        {
+            topLeft = (*it);
+            TLDistance = TLDistanceCurr;
+        }
+        // bottom left
+        if(BLDistanceCurr < BLDistance)
+        {
+            bottomLeft = (*it);
+            BLDistance = BLDistanceCurr;
+        }
+        // bottom right
+        if(BRDistanceCurr < BRDistance)
+        {
+            bottomRight = (*it);
+            BRDistance = BRDistanceCurr;
+        }
+        // top right
+        if(TRDistanceCurr < TRDistance)
+        {
+            topRight = (*it);
+            TRDistance = TRDistanceCurr;
+        }
+    }
+
 	// if any point are same, cancel
 	if (bottomLeft == topLeft || bottomLeft == bottomRight || bottomLeft == topRight ||
 		topLeft == bottomRight || topLeft == topRight || bottomRight == topRight)
@@ -50,9 +91,8 @@ void ProjectorCalibration::Get4CornersOfChessboard()
 	}
 
     // offset settings
-	float distance = static_cast<float>(cv::norm(topLeft - cv::Point2f(0,0)));
-    const float offsetX = distance;
-    const float offsetY = distance;
+    const float offsetX = topLeft.x;
+    const float offsetY = topLeft.y;
 
 	// calculate the desired values of points
     const float maxWidth = static_cast<float>(MAX(cv::norm(bottomRight - bottomLeft),
@@ -97,7 +137,7 @@ bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, 
 	}
 
 	// corners found, try to get four corresponding points
-	Get4CornersOfChessboard();
+	Get4CornersOfChessboard(inputImage.size());
 	if (_isError)
 	{
         return false;
@@ -112,6 +152,19 @@ bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, 
 	cv::rectangle(inputImage, cv::Rect(bottomRightCorner.x, bottomRightCorner.y, 2, 2), cv::Scalar(255, 0, 0));
 	cv::rectangle(inputImage, cv::Rect(chessboardCenter.x, chessboardCenter.y, 2, 2), cv::Scalar(0, 0, 255));*/
 
+    /*std::cout << _projectionPointsOrigin << std::endl;
+    std::cout << _projectionPointsTarget << std::endl;
+    for(auto &item : _projectionPointsOrigin)
+    {
+        cv::rectangle(inputImage, cv::Rect(item.x,item.y, 5,5), cv::Scalar(0, 0, 255, 255));
+    }
+    cv::rectangle(inputImage, cv::Rect(_projectionPointsOrigin[0].x, _projectionPointsOrigin[0].y, 5, 5), cv::Scalar(255, 0, 0, 255));
+    for (auto &item : _projectionPointsTarget)
+    {
+        cv::rectangle(inputImage, cv::Rect(item.x, item.y, 5, 5), cv::Scalar(0, 255, 0, 255));
+    }
+
+    cv::imshow("TEMP", inputImage);*/
     //find transform matrix 
     const cv::Mat proj = cv::getPerspectiveTransform(_projectionPointsOrigin, _projectionPointsTarget);
     /*std::vector<cv::Point2f> temp;
@@ -127,11 +180,11 @@ bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, 
 
 
     _inversePerspectiveMatrix = proj.inv();
+
     // copy to output
     for(auto i=0; i < 3; ++i)
         for(auto j=0; j < 3; ++j)        
             output[3*i + j] = _inversePerspectiveMatrix.at<double>(i,j);
-
 
 	/*cv::Mat temp;
 	cv::warpPerspective(inputImage, temp, _inversePerspectiveMatrix, cv::Size(2 * inputImage.cols, 2 * inputImage.rows));
@@ -139,16 +192,17 @@ bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, 
 	cv::imshow("inv", temp);*/
 	
 	// according to table setting, calculate the real size of square in chessboard
-    _squareSizeMm = static_cast<float>(tableCalibResult->mmInPixels * cv::norm(_foundedCorners[0] - _foundedCorners[1]));
+    _squareSizeMm = static_cast<double>(tableCalibResult->mmInPixels * cv::norm(_foundedCorners[0] - _foundedCorners[1]));
+    // outside the size in pixels is needed
     sizeOut = _squareSizeMm;
 
 	// calculate the size of table for projector, the common known point is one corner of chessboard
-	double width = static_cast<double>(inputImage.cols);
-	double height = static_cast<double>(inputImage.rows);
+	const double width = static_cast<double>(inputImage.cols);
+	const double height = static_cast<double>(inputImage.rows);
 	tableCorners[0] = -_foundedCorners[0].x;			// x1 -> top left
 	tableCorners[1] = -_foundedCorners[0].y;			// y1
-	tableCorners[2] = width;
-	tableCorners[3] = height;
+	tableCorners[2] = width* static_cast<double>(tableCalibResult->mmInPixels);
+	tableCorners[3] = height* static_cast<double>(tableCalibResult->mmInPixels);
 	/*tableCorners[2] = -_foundedCorners[0].x;			// x2 -> bottom left
 	tableCorners[3] = height - _foundedCorners[0].y;	// y2
 	tableCorners[4] = width - _foundedCorners[0].x;		// x3 -> bottom right

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone = "yes"?>
+<ARBang>
+	<ARBangTableSettings id="0">
+		<CentralArea start_x="35" start_y="0" width="30" height="65" />
+		<Players numberOf="4">
+			<Player id="0">
+				<!-- Player with id 0 is settings for whole table and contain cetral area with packs of cards -->
+				<ActiveArea start_x="35" start_y="0" width="30" height="65" />
+			</Player>
+			<Player id="1">
+				<ActiveArea start_x="0" start_y="0" width="35" height="65" />
+			</Player>
+			<Player id="2">
+				<ActiveArea start_x="0" start_y="65" width="50" height="35" />
+			</Player>
+			<Player id="3">
+				<ActiveArea start_x="50" start_y="65" width="50" height="35" />
+			</Player>
+			<Player id="4">
+				<ActiveArea start_x="65" start_y="0" width="35" height="65" />
+			</Player>
+		</Players>
+		<CardsPosition>
+			<Card id="0" player_id="0" size_id="0" left_top_corner_x="10" left_top_corner_y="10" turn_ninety="false" />
+			<Card id="1" player_id="1" size_id="0" left_top_corner_x="15" left_top_corner_y="10" turn_ninety="true" />
+		</CardsPosition>
+	</ARBangTableSettings>
+	<ARBangGameSettings>
+		<CardSize id="0">
+			<height>5</height>
+			<width>6</width>
+		</CardSize>
+	</ARBangGameSettings>
+</ARBang>

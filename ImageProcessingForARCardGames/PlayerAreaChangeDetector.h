@@ -7,8 +7,8 @@
 
 
 // number of frames before the hand of player is again detected
-#define LOWER_THRESHOLD 40
-#define UPPER_THRESHOLD 90
+#define LOWER_THRESHOLD 7
+#define UPPER_THRESHOLD 15
 
 namespace IDAP
 {
