@@ -199,8 +199,8 @@ bool ProjectorCalibration::GetProjectionMatrix(double* output, double& sizeOut, 
 	// calculate the size of table for projector, the common known point is one corner of chessboard
 	const double width = static_cast<double>(inputImage.cols);
 	const double height = static_cast<double>(inputImage.rows);
-	tableCorners[0] = -_foundedCorners[0].x;			// x1 -> top left
-	tableCorners[1] = -_foundedCorners[0].y;			// y1
+	tableCorners[0] = _foundedCorners[0].x * static_cast<double>(tableCalibResult->mmInPixels);;			// x1 -> top left in mm
+	tableCorners[1] = _foundedCorners[0].y * static_cast<double>(tableCalibResult->mmInPixels);;			// y1
 	tableCorners[2] = width* static_cast<double>(tableCalibResult->mmInPixels);
 	tableCorners[3] = height* static_cast<double>(tableCalibResult->mmInPixels);
 	/*tableCorners[2] = -_foundedCorners[0].x;			// x2 -> bottom left

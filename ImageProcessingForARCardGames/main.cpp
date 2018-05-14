@@ -198,7 +198,7 @@ int main() {
 	std::cout << "mmInPixels: " << access->GetTableCalibration()->GetTableCalibrationResult()->mmInPixels << std::endl;
 
 	// ------------------------------ PROJECTION CALIBRATION ---------------------
-	double* matrix = new double[9]{ 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
+	/*double* matrix = new double[9]{ 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
     double size = 0.0;
 	double* tableValues = new double[4]{ 0.0,0.0,0.0,0.0 };
     access->PrepareNextFrame(errorCode);
@@ -229,7 +229,7 @@ int main() {
 		std::cout << "Cannot find chessboard. " << errorCode3 << std::endl;
 	}
 	cv::namedWindow("center");
-	cv::imshow("center", access->getFrame());
+	cv::imshow("center", access->getFrame());*/
     
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------
     access->InitImageDetectionAccessPointDataAndDetection(errorCode, TABLE_ID);
@@ -272,14 +272,22 @@ int main() {
         if(active)
             std::cout << "----------------\n";
 		// TO-DO: CHECK IF CARD HAS CHANGED
+        
 		
 		// check card if c pressed
 		if (pressed == 'c')
 		{
-			for (uint16_t i = 0; i < access->GetNumberOfCardAreas(); i++)
+            uint16_t cardID = 0;
+            uint16_t cardType = 0;
+            access->IsCardChangedByID(errorCode, cardID, cardType);
+            if (errorCode != 0)
+            {
+                std::cout << "ERROR while card check" << std::endl;
+            }
+			/*for (uint16_t i = 0; i < access->GetNumberOfCardAreas(); i++)
 			{
 				access->IsCardChangedByID(errorCode, i, cardID);
-			}
+			}*/
 		}
 		// exit on q pressed
 		if (pressed == 'q')

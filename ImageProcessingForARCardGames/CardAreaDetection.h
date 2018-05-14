@@ -14,7 +14,7 @@ namespace IDAP
 	class CardAreaDetection
 	{
 	public:
-		CardAreaDetection(int _id, int _playerID, int _sizeID, int _xPos, int _yPos, int _width, int _height);
+		CardAreaDetection(int _id, int _playerID, int _sizeID, int _xPos, int _yPos, int _width, int _height, int imageWidth, int imageHeight, float mmInPixel);
 		~CardAreaDetection();
 
 		uint16_t isCardChanged(cv::Mat currentFrame); // core function with template matching function

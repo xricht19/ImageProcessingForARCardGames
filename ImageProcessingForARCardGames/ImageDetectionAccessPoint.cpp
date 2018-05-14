@@ -121,12 +121,14 @@ namespace IDAP
 		// go over all player and create detector for their area; 
 		for (std::vector<PlayerInfo*>::iterator it = playersInfo.begin(); it != playersInfo.end(); ++it)
 		{
-			// create new PlayerAreaActiveDetector
-			PlayerInfo* info = *it;
-			PlayerAreaActiveDetector* newDetector = new PlayerAreaActiveDetector(info->getID(),
-				info->getAreaX(), info->getAreaY(), info->getAreaWidth(), info->getAreaHeight());
+            
+            // create new PlayerAreaActiveDetector
+            PlayerInfo* info = *it;
+            PlayerAreaActiveDetector* newDetector = new PlayerAreaActiveDetector(info->getID(),
+                info->getAreaX(), info->getAreaY(), info->getAreaWidth(), info->getAreaHeight());
 
-			isPlayerActiveDetectors.insert(std::pair<int, PlayerAreaActiveDetector*>(info->getID(), newDetector));
+            isPlayerActiveDetectors.insert(std::pair<int, PlayerAreaActiveDetector*>(info->getID(), newDetector));
+            
 		}
 	}
 
@@ -135,12 +137,20 @@ namespace IDAP
 		// go over all card position and check if changed
 		for (std::vector<CardPosition*>::iterator it = cardPositions.begin(); it != cardPositions.end(); ++it)
 		{
-			CardPosition* cPos = *it;
-			CardSize* cSize = getCardSizeByID(cPos->getCardSizeID());
-			CardAreaDetection* newDetector = new CardAreaDetection(cPos->getID(), cPos->getPlayerID(), cPos->getCardSizeID(),
-			                                                       cPos->getLeftTopX(), cPos->getLeftTopY(), cSize->getWidth(), cSize->getHeight());
+            if (GetTableCalibration()->IsCalibrationDone())
+            {
+			    CardPosition* cPos = *it;
+			    CardSize* cSize = getCardSizeByID(cPos->getCardSizeID());
+			    CardAreaDetection* newDetector = new CardAreaDetection(cPos->getID(), cPos->getPlayerID(), cPos->getCardSizeID(),
+			                                                           cPos->getLeftTopX(), cPos->getLeftTopY(), cSize->getWidth(), cSize->getHeight(),
+                                                                       frame.cols, frame.rows, GetTableCalibration()->GetTableCalibrationResult()->mmInPixels);
 
-			cardAreaDetectors.insert(std::pair<int, CardAreaDetection*>(cPos->getID(), newDetector));
+			    cardAreaDetectors.insert(std::pair<int, CardAreaDetection*>(cPos->getID(), newDetector));
+            }
+            else
+            {
+                fprintf(stderr, "initCardAreaDetectors -> The table calibration must be finished apriori!\n");
+            }
 		}
 	}
 
