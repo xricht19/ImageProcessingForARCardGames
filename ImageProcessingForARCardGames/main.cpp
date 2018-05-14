@@ -70,8 +70,7 @@ int main() {
 	}
 
 	// ------------------------------------- INIT CAMERA ---------------------------------------------
-	std::string path = "ARBang/Settings0.xml";
-	access->InitImageDetectionAccessPointCamera(errorCode, cameraId);
+	/*access->InitImageDetectionAccessPointCamera(errorCode, cameraId);
 	if (errorCode != IDAP::ImageDetectionAccessPoint::OK)
 	{
 		fprintf(stderr, "Cannot init IDAP!\n");
@@ -79,7 +78,7 @@ int main() {
 		exit(1);
 	}
 	// IF USING KINECT FLIP THE IMAGE ON Y AXIS
-	access->SetFlipVertically();
+	//access->SetFlipVertically();
 
 	// ----------------------------------- CAMERA  CALIBRATION ---------------------------------------
 	// check if camera calibration file exists, skip calibration in that case
@@ -136,7 +135,7 @@ int main() {
 		cv::waitKey(1000 / 20); // 20 fps
 		enoughNumber++;
 	}*/
-	const cv::Mat frame = access->getFrame();
+	/*const cv::Mat frame = access->getFrame();
 	// detect aruco markers and show them
 	TableCalibration* tblCalib = access->GetTableCalibration();
 
@@ -235,7 +234,12 @@ int main() {
     access->InitImageDetectionAccessPointDataAndDetection(errorCode, TABLE_ID);
 
 	std::cout << "Loading Game Card Data" << std::endl;
-    access->LoadCardData("ARBang/gameCardData");
+    access->LoadCardData(errorCode, GAME_CARD_PATH);
+
+	if (errorCode != 0)
+	{
+
+	}
 
     std::cout << "Data Loaded" << std::endl;
 
@@ -255,7 +259,7 @@ int main() {
 	{
 		char pressed = cv::waitKey(40);
 		// get next frame from camera
-		access->PrepareNextFrame(errorCode);
+		/*access->PrepareNextFrame(errorCode);
 		cv::imshow("Current", access->getSubSampledFrame());
 		// for all players, check if area is active
 		double isActive;
@@ -270,9 +274,12 @@ int main() {
 			}
 		}
         if(active)
-            std::cout << "----------------\n";
+            std::cout << "----------------\n";*/
 		// TO-DO: CHECK IF CARD HAS CHANGED
-        
+		uint16_t cardID = 0;
+		uint16_t cardType = 0;
+		access->IsCardChangedByID(errorCode, cardID, cardType);
+
 		
 		// check card if c pressed
 		if (pressed == 'c')

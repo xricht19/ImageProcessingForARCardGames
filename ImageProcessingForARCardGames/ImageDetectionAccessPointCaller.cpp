@@ -54,8 +54,8 @@ namespace IDAP
         instance->IsPlayerActiveByID(errorCode, playerID, intensity);
     }
 
-    void IsCardChangedByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& positionID, uint16_t& cardID) {
-        instance->IsCardChangedByID(errorCode, positionID, cardID);
+    void IsCardChangedByIDCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode, uint16_t& cardID, uint16_t& cardType) {
+        instance->IsCardChangedByID(errorCode, cardID, cardType);
     }
 
     void SetFlipHorizontallyCaller(ImageDetectionAccessPoint* instance, uint16_t& errorCode)

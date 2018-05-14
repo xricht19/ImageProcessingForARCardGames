@@ -18,6 +18,8 @@
 
 #define GAME_DATA_PATH "Assets/ARBang/Settings0.xml"
 
+#define GAME_CARD_PATH "Assets/ARBang/cardData"
+#define CARD_MATCHING_WIDTH 60
 
 namespace IDAP
 {
@@ -79,7 +81,7 @@ namespace IDAP
 		int getAreaHeight() { return areaHeight; }
 	};
 
-
+	class CardAreaDetection;
 	class ImageDetectionAccessPoint
 	{
 	private:
@@ -97,9 +99,6 @@ namespace IDAP
 		std::vector<CardSize*> cardTypes;
 		std::vector<CardPosition*> cardPositions;
 		std::vector<PlayerInfo*> playersInfo;
-
-		// loaded card data for matching
-		std::map<std::string, cv::Mat> gameCardData;
 
 		bool usingROS = false;
 
@@ -149,17 +148,17 @@ namespace IDAP
 		void InitImageDetectionAccessPointROS(uint16_t&, uchar*, uint16_t&, const char*&);
 		void GetVideoResolution(uint16_t&, uint16_t&, uint16_t&);
 		// load cards data
-		void LoadCardData(std::string); // path to folder with data required
+		void LoadCardData(uint16_t& errorCode, std::string);
 
 		void PrepareNextFrame(uint16_t&);
 		void GetCurrentFrameSize(uint16_t&, uint16_t&, uint16_t&, uint16_t&);
 		void GetCurrentFrameData(uint16_t&, uint16_t&, uint16_t&, uint16_t&, uchar*);
 		void IsPlayerActiveByID(uint16_t&, uint16_t&, double&);
-		void IsCardChangedByID(uint16_t&, uint16_t&, uint16_t&);
+		void IsCardChangedByID(uint16_t& errorCode, uint16_t& cardID, uint16_t& cardType);
 
-		std::map<std::string, cv::Mat>* GetGameCardData();
 		uint16_t GetNumberOfCardAreas();
 		uint16_t GetNumberOfPlayers();
+		std::vector<std::pair<int, cv::Mat>>& GetCardData() { return cardData; }
 
 		int errorCode;
 

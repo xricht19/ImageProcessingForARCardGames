@@ -1,16 +1,42 @@
 #include "ImageDetectionAccessPoint.h"
 
+// defines includes
+#include <opencv2\imgcodecs\imgcodecs_c.h>
+#include <opencv2\imgproc\imgproc_c.h>
+
 namespace IDAP
 {
-	void ImageDetectionAccessPoint::LoadCardData(std::string path)
+	void ImageDetectionAccessPoint::LoadCardData(uint16_t& errorCode, std::string path)
 	{
+		std::stringstream convertStream;
 		// list all files in given folder and load them to memory and provide them to card area detection for template matching
 		for (auto &file : std::experimental::filesystem::directory_iterator(path))
 		{
 			cv::Mat img = cv::imread(file.path().string().c_str(), CV_LOAD_IMAGE_COLOR);
-			// TO-DO: PERFORM SUBSAMPLING, MAYBE SAVE SUBSAMPLED (MAYBE ONLY GREYSCALE) TO NEW FOLDER AND LOOK FOR IT ON LOADING,
-			//		  WE DO NOT HAVE TO LOAD LARGE IMAGES AND SUBSAMPLE THEM WHENEVER THE APP IS STARTED
-			gameCardData.insert(std::make_pair(file.path().string(), img));
+			// subsample and save
+			const float ratio = static_cast<float>(img.rows) / static_cast<float>(img.cols);
+			const cv::Size ss(CARD_MATCHING_WIDTH, CARD_MATCHING_WIDTH*ratio);
+			cv::Mat subImg;
+			cv::resize(img, subImg, ss);
+
+			int cardType = -1;
+			std::string name = file.path().string();
+			std::size_t indexE = name.find(".");
+			std::size_t indexS = name.find_last_of("\\");
+			name = name.substr(indexS+1, indexE-indexS-1);
+			convertStream << name;
+			convertStream >> cardType;
+
+			if (cardType == -1)
+			{
+				errorCode = 501;
+			}
+
+			cardData.push_back(std::make_pair(cardType, subImg));
+			
+			// init for next
+			convertStream.clear();
+			convertStream.str(std::string());
 		}
 	}
 
@@ -137,7 +163,7 @@ namespace IDAP
 		// go over all card position and check if changed
 		for (std::vector<CardPosition*>::iterator it = cardPositions.begin(); it != cardPositions.end(); ++it)
 		{
-            if (GetTableCalibration()->IsCalibrationDone())
+            //if (GetTableCalibration()->IsCalibrationDone()) ---------------------------------------------------------------- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             {
 			    CardPosition* cPos = *it;
 			    CardSize* cSize = getCardSizeByID(cPos->getCardSizeID());
@@ -147,10 +173,10 @@ namespace IDAP
 
 			    cardAreaDetectors.insert(std::pair<int, CardAreaDetection*>(cPos->getID(), newDetector));
             }
-            else
+            /*else
             {
                 fprintf(stderr, "initCardAreaDetectors -> The table calibration must be finished apriori!\n");
-            }
+            }*/
 		}
 	}
 
@@ -204,18 +230,24 @@ namespace IDAP
 			playersInfo.clear();
 		}
 		// free std::map<int, PlayerAreaActiveDetector> isPlayerActiveDetectors;
-		for (std::map<int, PlayerAreaActiveDetector*>::iterator it = isPlayerActiveDetectors.begin(); it != isPlayerActiveDetectors.end(); it++) {
+		for (std::map<int, PlayerAreaActiveDetector*>::iterator it = isPlayerActiveDetectors.begin(); it != isPlayerActiveDetectors.end();) {
 			if (it->second != NULL) {
 				delete(it->second);
 				it->second = NULL;
 			}
+			it = isPlayerActiveDetectors.erase(it);
 		}
 		// free std::map<int, CardAreaDetection*> cardAreaDetectors;
-		for (std::map<int, CardAreaDetection*>::iterator it = cardAreaDetectors.begin(); it != cardAreaDetectors.end(); it++) {
+		for (std::map<int, CardAreaDetection*>::iterator it = cardAreaDetectors.begin(); it != cardAreaDetectors.end();) {
 			if (it->second != NULL) {
 				delete(it->second);
 				it->second = NULL;
 			}
+			it = cardAreaDetectors.erase(it);
+		}
+		// free std::vector<std::pair<int, cv::Mat>> cardData;
+		for (std::vector<std::pair<int, cv::Mat>>::iterator it = cardData.begin(); it != cardData.end();) {
+			it = cardData.erase(it);
 		}
 	}
 
@@ -266,6 +298,8 @@ namespace IDAP
             delete(_cameraCalib);
         if (_tableCalib != nullptr)
             delete(_tableCalib);
+		if (_projectorCalib != nullptr)
+			delete(_projectorCalib);
 
 		freeSettings();
 	}
@@ -374,14 +408,9 @@ namespace IDAP
 	 * \brief Go through all card positions and check if change occure.
 	 * @param cardID Sent by reference, contain the card id found in roi for the given ID.
 	 */
-	void ImageDetectionAccessPoint::IsCardChangedByID(uint16_t& errorCode, uint16_t&ID, uint16_t&cardID)
+	void ImageDetectionAccessPoint::IsCardChangedByID(uint16_t& errorCode, uint16_t&cardID, uint16_t&cardType)
 	{
-		cardID = cardAreaDetectors[ID]->isCardChanged(frame);
-	}
-
-	std::map<std::string, cv::Mat>* ImageDetectionAccessPoint::GetGameCardData()
-	{
-		return &gameCardData;
+		cardAreaDetectors[cardID]->isCardChanged(errorCode, frame, GetCardData(), cardType);
 	}
 
 	uint16_t ImageDetectionAccessPoint::GetNumberOfCardAreas()

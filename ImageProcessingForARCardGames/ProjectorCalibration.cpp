@@ -3,6 +3,9 @@
 #include <opencv2/videostab/ring_buffer.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+// defines includes
+#include <opencv2\calib3d\calib3d_c.h>
+
 
 bool ProjectorCalibration::DetectChessboardCorners(cv::Mat image)
 {
