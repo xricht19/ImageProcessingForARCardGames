@@ -104,6 +104,7 @@ namespace IDAP
 
 		// card data for template matching
 		std::vector<std::pair<int, cv::Mat>> cardData;
+        cv::Mat meanCard;
 
 		// additional function to load settings from xml
 		void loadSettingsFromXml(const char*, int);
@@ -159,6 +160,7 @@ namespace IDAP
 		uint16_t GetNumberOfCardAreas();
 		uint16_t GetNumberOfPlayers();
 		std::vector<std::pair<int, cv::Mat>>& GetCardData() { return cardData; }
+        cv::Mat& GetMeanCard() { return meanCard; }
 
 		int errorCode;
 

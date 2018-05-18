@@ -8,6 +8,10 @@ namespace IDAP
 {
 	void ImageDetectionAccessPoint::LoadCardData(uint16_t& errorCode, std::string path)
 	{
+        cv::Size meanSize(60, 60);
+        cv::Mat accMean(meanSize, CV_64FC3, cv::Scalar(0));
+
+        // name convertor
 		std::stringstream convertStream;
 		// list all files in given folder and load them to memory and provide them to card area detection for template matching
 		for (auto &file : std::experimental::filesystem::directory_iterator(path))
@@ -34,10 +38,23 @@ namespace IDAP
 
 			cardData.push_back(std::make_pair(cardType, subImg));
 			
+		    // add to mean card
+            cv::Mat forMean;
+            cv::resize(img, forMean, meanSize);
+            cv::accumulate(forMean, accMean);
+
 			// init for next
 			convertStream.clear();
 			convertStream.str(std::string());
 		}
+
+        // mean card normalization
+        cv::Mat meanCardColor;
+        accMean.convertTo(meanCardColor, CV_8UC3, 1.0 / cardData.size());
+        cv::Canny(meanCardColor, meanCard, 100, 200);
+
+
+        cv::imshow("meanCard", meanCard);
 	}
 
 	// private function area ------------------------------------------------------------------
@@ -408,9 +425,9 @@ namespace IDAP
 	 * \brief Go through all card positions and check if change occure.
 	 * @param cardID Sent by reference, contain the card id found in roi for the given ID.
 	 */
-	void ImageDetectionAccessPoint::IsCardChangedByID(uint16_t& errorCode, uint16_t&cardID, uint16_t&cardType)
+	void ImageDetectionAccessPoint::IsCardChangedByID(uint16_t& errorCode, uint16_t&cardID, uint16_t& cardType)
 	{
-		cardAreaDetectors[cardID]->isCardChanged(errorCode, frame, GetCardData(), cardType);
+		cardAreaDetectors[cardID]->isCardChanged(errorCode, frame, GetCardData(), GetMeanCard(), cardType);
 	}
 
 	uint16_t ImageDetectionAccessPoint::GetNumberOfCardAreas()

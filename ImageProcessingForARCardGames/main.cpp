@@ -70,7 +70,7 @@ int main() {
 	}
 
 	// ------------------------------------- INIT CAMERA ---------------------------------------------
-	/*access->InitImageDetectionAccessPointCamera(errorCode, cameraId);
+	access->InitImageDetectionAccessPointCamera(errorCode, cameraId);
 	if (errorCode != IDAP::ImageDetectionAccessPoint::OK)
 	{
 		fprintf(stderr, "Cannot init IDAP!\n");
@@ -78,7 +78,7 @@ int main() {
 		exit(1);
 	}
 	// IF USING KINECT FLIP THE IMAGE ON Y AXIS
-	//access->SetFlipVertically();
+	access->SetFlipVertically();
 
 	// ----------------------------------- CAMERA  CALIBRATION ---------------------------------------
 	// check if camera calibration file exists, skip calibration in that case
@@ -135,11 +135,11 @@ int main() {
 		cv::waitKey(1000 / 20); // 20 fps
 		enoughNumber++;
 	}*/
-	/*const cv::Mat frame = access->getFrame();
+	const cv::Mat frame = access->getFrame();
 	// detect aruco markers and show them
 	TableCalibration* tblCalib = access->GetTableCalibration();
 
-	cv::namedWindow("CalibResult", CV_WINDOW_NORMAL);
+	cv::namedWindow("CalibResult");
 	// check calibration result
 	while (true)
 	{
@@ -259,7 +259,7 @@ int main() {
 	{
 		char pressed = cv::waitKey(40);
 		// get next frame from camera
-		/*access->PrepareNextFrame(errorCode);
+		access->PrepareNextFrame(errorCode);
 		cv::imshow("Current", access->getSubSampledFrame());
 		// for all players, check if area is active
 		double isActive;
@@ -274,31 +274,23 @@ int main() {
 			}
 		}
         if(active)
-            std::cout << "----------------\n";*/
+            std::cout << "----------------\n";
 		// TO-DO: CHECK IF CARD HAS CHANGED
 		uint16_t cardID = 0;
-		uint16_t cardType = 0;
-		access->IsCardChangedByID(errorCode, cardID, cardType);
-
+        uint16_t cardType = 0;
 		
-		// check card if c pressed
-		if (pressed == 'c')
-		{
-            uint16_t cardID = 0;
-            uint16_t cardType = 0;
-            access->IsCardChangedByID(errorCode, cardID, cardType);
-            if (errorCode != 0)
-            {
-                std::cout << "ERROR while card check" << std::endl;
-            }
-			/*for (uint16_t i = 0; i < access->GetNumberOfCardAreas(); i++)
-			{
-				access->IsCardChangedByID(errorCode, i, cardID);
-			}*/
-		}
+	    access->IsCardChangedByID(errorCode, cardID, cardType);
+
+        if(cardType != 0)
+        {
+            std::cout << "Some card was detected." << std::endl;
+        }
+
 		// exit on q pressed
 		if (pressed == 'q')
 			break;
+
+        cv::waitKey(40);
 	}
 
 	// free memory
