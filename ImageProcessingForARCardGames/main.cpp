@@ -1,4 +1,5 @@
 #include "ImageDetectionAccessPoint.h"
+#include "ImageDetectionAccessPointCaller.h"
 
 #include <opencv2\core\core.hpp>
 #include <opencv2\highgui\highgui.hpp>
@@ -22,9 +23,10 @@ int main() {
 	std::cout << "Size of 16 doubles: " << sizeof(double) * 16 << std::endl;
 	// get list of all cameras ----------- CAMERA SELECTION ------------------------------------------
 	{
-		/*uint16_t numOfAvailCam;
+		uint16_t numOfAvailCam;
 		IDAP::ImageDetectionAccessPoint::GetNumberOfAllAvailableDevices(errorCode, numOfAvailCam);
-		if (errorCode == IDAP::ImageDetectionAccessPoint::ErrorCodes::OK)
+        std::cout << "Avail devicss: " << numOfAvailCam << std::endl;
+		/*if (errorCode == IDAP::ImageDetectionAccessPoint::ErrorCodes::OK)
 		{
 			// list all devices in loop
 			int temp = 0;
@@ -294,7 +296,9 @@ int main() {
 	}
 
 	// free memory
-	delete(access);
+    IDAP::DestroyImageDetectionAccessPoint(access);
 	std::cout << "ALL DONE" << std::endl;
+
+    int tj = 5;
 
 }

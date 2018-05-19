@@ -14,15 +14,15 @@ IDAP::CardAreaDetection::CardAreaDetection(int _id, int _playerID, int _sizeID, 
 	posX = _xPos;
 	posY = _yPos;
 	
-    // to over come the inaccuracy of calibration, the roi is 50 % bigger
-    const float deltaWidth = (_width * mmInPixel) * 0.50;
-    const float deltaHeight = (_height * mmInPixel) * 0.50;
+    // to over come the inaccuracy of calibration, the roi is 30 % bigger
+    const float deltaWidth = (_width / mmInPixel) * 0.3;
+    const float deltaHeight = (_height / mmInPixel) * 0.3;
 
     const float newPosX = (posX * (imageWidth / 100.f)) - deltaWidth / 2.f;
     const float newPosY = (posY * (imageHeight / 100.f)) - deltaHeight / 2.f;
 
 
-	roi = cv::Rect(newPosX, newPosY, (_width * mmInPixel) + deltaWidth, (_height*mmInPixel) + deltaHeight);
+	roi = cv::Rect(newPosX, newPosY, (_width / mmInPixel) + deltaWidth, (_height / mmInPixel) + deltaHeight);
 	
 	initState = true;
 	results = new TopThree();
@@ -34,11 +34,10 @@ IDAP::CardAreaDetection::~CardAreaDetection()
 	delete(results);
 }
 
-void IDAP::CardAreaDetection::isCardChanged(uint16_t& errorCode, cv::Mat currentFrame, std::vector<std::pair<int, cv::Mat>>& cardDataReference, cv::Mat meanCard, uint16_t& cardType)
+void IDAP::CardAreaDetection::isCardChanged(uint16_t& errorCode, cv::Mat currentFrame, std::vector<std::pair<int, cv::Mat>>& cardDataReference, cv::Mat meanCard, uint16_t& cardType) const
 {   
 	// cut roi from frame, settle up card in it, set the right direction and perform template matching
     const cv::Mat area = currentFrame(roi);
-
     // get bounding box around biggest contour to quickly determine if there is any card
     cv::Mat gray, blurr, thresh;
     cv::cvtColor(area, gray, CV_BGR2GRAY);
@@ -49,13 +48,13 @@ void IDAP::CardAreaDetection::isCardChanged(uint16_t& errorCode, cv::Mat current
     // get contours
     std::vector<std::vector<Point> > contours;
     std::vector<Vec4i> hierarchy;
-    cv::findContours(thresh, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+    cv::findContours(thresh, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
 
     int largest_area = 0;
     int largest_contour_index = 0;
     Rect bounding_rect;
 
-    for (int i = 0; i< contours.size(); i++) // iterate through each contour. 
+    for (int i = 0; i < contours.size(); i++) // iterate through each contour. 
     {
         const Rect curBounding_rect = boundingRect(contours[i]);
         const int currentArea = curBounding_rect.size().width*curBounding_rect.size().height;
@@ -77,11 +76,13 @@ void IDAP::CardAreaDetection::isCardChanged(uint16_t& errorCode, cv::Mat current
     imshow("thresh", thresh);
 
     const float contourRatio = static_cast<float>(bounding_rect.size().width*bounding_rect.size().height) / static_cast<float>(roi.size().width*roi.size().height);
-
-    std::cout << contourRatio << std::endl;
     if(contourRatio > CONTOUR_TO_ROI_TO_IS_CARD)
     {
         std::cout << "Card, classifing" << std::endl;
+        if(cardDataReference.size() > 0)
+        {
+            imshow("result", gray);
+        }       
         
         // THINK ABOUT: may cut by bounding box of biggest contour
 
@@ -96,7 +97,7 @@ void IDAP::CardAreaDetection::isCardChanged(uint16_t& errorCode, cv::Mat current
             it->second.copyTo(img_2);
 
             //-- Step 1: Detect the keypoints using SURF Detector, compute the descriptors
-            int minHessian = 400;
+            const int minHessian = 400;
             Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create();
             detector->setHessianThreshold(minHessian);
             std::vector<KeyPoint> keypoints_1, keypoints_2;
@@ -147,7 +148,6 @@ void IDAP::CardAreaDetection::isCardChanged(uint16_t& errorCode, cv::Mat current
         }
         // save classified card
         cardType = results->GetFirst();
-
         results->Init();
     }
     else

@@ -1,22 +1,17 @@
 #include "ImageDetectionAccessPoint.h"
 
-// defines includes
-#include <opencv2\imgcodecs\imgcodecs_c.h>
-#include <opencv2\imgproc\imgproc_c.h>
 
 namespace IDAP
 {
 	void ImageDetectionAccessPoint::LoadCardData(uint16_t& errorCode, std::string path)
 	{
-        cv::Size meanSize(60, 60);
-        cv::Mat accMean(meanSize, CV_64FC3, cv::Scalar(0));
 
         // name convertor
 		std::stringstream convertStream;
 		// list all files in given folder and load them to memory and provide them to card area detection for template matching
 		for (auto &file : std::experimental::filesystem::directory_iterator(path))
 		{
-			cv::Mat img = cv::imread(file.path().string().c_str(), CV_LOAD_IMAGE_COLOR);
+			const cv::Mat img = cv::imread(file.path().string().c_str(), CV_LOAD_IMAGE_COLOR);
 			// subsample and save
 			const float ratio = static_cast<float>(img.rows) / static_cast<float>(img.cols);
 			const cv::Size ss(CARD_MATCHING_WIDTH, CARD_MATCHING_WIDTH*ratio);
@@ -25,8 +20,8 @@ namespace IDAP
 
 			int cardType = -1;
 			std::string name = file.path().string();
-			std::size_t indexE = name.find(".");
-			std::size_t indexS = name.find_last_of("\\");
+			const std::size_t indexE = name.find(".");
+			const std::size_t indexS = name.find_last_of("\\");
 			name = name.substr(indexS+1, indexE-indexS-1);
 			convertStream << name;
 			convertStream >> cardType;
@@ -36,25 +31,12 @@ namespace IDAP
 				errorCode = 501;
 			}
 
-			cardData.push_back(std::make_pair(cardType, subImg));
-			
-		    // add to mean card
-            cv::Mat forMean;
-            cv::resize(img, forMean, meanSize);
-            cv::accumulate(forMean, accMean);
+			cardData.emplace_back(cardType, subImg);
 
 			// init for next
 			convertStream.clear();
 			convertStream.str(std::string());
 		}
-
-        // mean card normalization
-        cv::Mat meanCardColor;
-        accMean.convertTo(meanCardColor, CV_8UC3, 1.0 / cardData.size());
-        cv::Canny(meanCardColor, meanCard, 100, 200);
-
-
-        cv::imshow("meanCard", meanCard);
 	}
 
 	// private function area ------------------------------------------------------------------
@@ -439,11 +421,13 @@ namespace IDAP
 	void ImageDetectionAccessPoint::GetNumberOfAllAvailableDevices(uint16_t &errorCode, uint16_t &numOfDevices)
 	{
 		numOfDevices = 0;
+        cv::VideoCapture testIfOpenPoss;
 		// try open all video stream, until not available
 		uint16_t deviceID = 0;
 		while (true) {
-            cv::VideoCapture testIfOpenPoss = cv::VideoCapture(deviceID);
+            testIfOpenPoss.open(deviceID);
 			if (!testIfOpenPoss.isOpened()) { // no more devices
+                testIfOpenPoss.release();
 				break;
 			}
 			numOfDevices++;
@@ -496,11 +480,6 @@ namespace IDAP
 
     void ImageDetectionAccessPoint::InitImageDetectionAccessPointROS(uint16_t &errorCode, uchar *ipAdress, uint16_t &port, const char* &settingsPath)
 	{
-#ifdef _WIN32
-		this->usingROS = true;
-#else
-		errorCode = ErrorCodes::CONNECTION_TO_ROS_IS_AVAILABLE_ONLY_ON_WINDOWS;
-#endif
 	}
 
 

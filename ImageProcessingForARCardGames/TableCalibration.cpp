@@ -90,25 +90,6 @@ void TableCalibration::DetectMarkers(cv::Mat inputImage)
     InitTableCalibration();
     const cv::Ptr<cv::aruco::Dictionary> markerDictionary = cv::aruco::getPredefinedDictionary(ARUCO_PREDEFINED_DICTIONARY);
     const cv::Ptr<cv::aruco::DetectorParameters> detectorParams = cv::aruco::DetectorParameters::create();
-    /*detectorParams->adaptiveThreshWinSizeMin = 3;
-    detectorParams->adaptiveThreshWinSizeMax = 23;
-    detectorParams->adaptiveThreshWinSizeStep = 10;
-    detectorParams->adaptiveThreshConstant = 7;
-    detectorParams->minMarkerPerimeterRate = 0.03;
-    detectorParams->maxMarkerPerimeterRate = 4.0;
-    detectorParams->polygonalApproxAccuracyRate = 0.05;
-    detectorParams->minCornerDistanceRate = 0.05;
-    detectorParams->minDistanceToBorder = 3;
-    detectorParams->minMarkerDistanceRate = 0.05;
-    detectorParams->cornerRefinementWinSize = 5;
-    detectorParams->cornerRefinementMaxIterations = 30;
-    detectorParams->cornerRefinementMinAccuracy = 0.1;
-    detectorParams->markerBorderBits = 1;
-    detectorParams->perspectiveRemovePixelPerCell = 8;
-    detectorParams->perspectiveRemoveIgnoredMarginPerCell = 0.13;
-    detectorParams->maxErroneousBitsInBorderRate = 0.35;
-    detectorParams->minOtsuStdDev = 5.0;
-    detectorParams->errorCorrectionRate = 0.6;*/
 
     cv::aruco::detectMarkers(inputImage, markerDictionary, _markersCorners, _markersIDs, detectorParams, _rejectedCandidates);
 	if(HasFourPoints())

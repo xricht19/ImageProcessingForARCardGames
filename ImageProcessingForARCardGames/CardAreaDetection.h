@@ -67,7 +67,7 @@ namespace IDAP
 		CardAreaDetection(int _id, int _playerID, int _sizeID, int _xPos, int _yPos, int _width, int _height, int imageWidth, int imageHeight, float mmInPixel);
 		~CardAreaDetection();
 
-		void isCardChanged(uint16_t& errorCode, cv::Mat currentFrame, std::vector<std::pair<int, cv::Mat>>& cardDataReference, cv::Mat meanCard, uint16_t& cardType); // core function with template matching function
+		void isCardChanged(uint16_t& errorCode, cv::Mat currentFrame, std::vector<std::pair<int, cv::Mat>>& cardDataReference, cv::Mat meanCard, uint16_t& cardType) const; // core function with template matching function
 
         void CardDetectionTester(std::vector<std::pair<int, cv::Mat>> cardDataReference);
 
