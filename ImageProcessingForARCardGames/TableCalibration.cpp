@@ -128,6 +128,7 @@ void TableCalibration::CalculateTableCalibrationResults(cv::Mat inputImage)
     projectionPointsTarget[BOTTOM_RIGHT] = cv::Point2f(maxWidth, maxHeight);
     projectionPointsTarget[TOP_RIGHT] = cv::Point2f(maxWidth, 0);
 
+    
     // calculate projection matrix
     _tableCalibResults->perspectiveProjectionMatrix = cv::getPerspectiveTransform(projectionPointsSource, projectionPointsTarget);
     _tableCalibResults->mmInPixels = GetMmInPixels();

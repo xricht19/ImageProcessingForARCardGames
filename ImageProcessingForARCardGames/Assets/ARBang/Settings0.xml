@@ -26,12 +26,12 @@
 		</Players>
 		<CardsPosition>
 			<!-- common -->
-			<Card id="0" player_id="0" size_id="0" left_top_corner_x="47" left_top_corner_y="25" turn="0" />
+			<Card id="0" player_id="0" size_id="0" left_top_corner_x="47" left_top_corner_y="25" turn_ninety="false" />
 			<!-- player 1 -->
 			<Card id="1" player_id="1" size_id="0" left_top_corner_x="2" left_top_corner_y="5" turn_ninety="true" />
-			<Card id="2" player_id="1" size_id="0" left_top_corner_x="2" left_top_corner_y="19" turn_ninety="true" />
-			<Card id="3" player_id="1" size_id="0" left_top_corner_x="2" left_top_corner_y="36" turn_ninety="true" />
-			<Card id="4" player_id="1" size_id="0" left_top_corner_x="2" left_top_corner_y="55" turn_ninety="true" />
+			<Card id="2" player_id="1" size_id="0" left_top_corner_x="2" left_top_corner_y="18" turn_ninety="true" />
+			<Card id="3" player_id="1" size_id="0" left_top_corner_x="2" left_top_corner_y="31" turn_ninety="true" />
+			<Card id="4" player_id="1" size_id="0" left_top_corner_x="2" left_top_corner_y="49" turn_ninety="true" />
 			<!-- player 2 -->
 			<Card id="5" player_id="2" size_id="0" left_top_corner_x="10" left_top_corner_y="73" turn_ninety="false" />
 			<Card id="6" player_id="2" size_id="0" left_top_corner_x="20" left_top_corner_y="73" turn_ninety="false" />
@@ -44,9 +44,9 @@
 			<Card id="12" player_id="3" size_id="0" left_top_corner_x="85" left_top_corner_y="73" turn_ninety="false" /> 
 			<!-- player 4 -->
 			<Card id="13" player_id="4" size_id="0" left_top_corner_x="85" left_top_corner_y="5" turn_ninety="true" />
-			<Card id="14" player_id="4" size_id="0" left_top_corner_x="85" left_top_corner_y="19" turn_ninety="true" />
-			<Card id="15" player_id="4" size_id="0" left_top_corner_x="85" left_top_corner_y="36" turn_ninety="true" />
-			<Card id="16" player_id="4" size_id="0" left_top_corner_x="85" left_top_corner_y="55" turn_ninety="true" /> 
+			<Card id="14" player_id="4" size_id="0" left_top_corner_x="85" left_top_corner_y="18" turn_ninety="true" />
+			<Card id="15" player_id="4" size_id="0" left_top_corner_x="85" left_top_corner_y="31" turn_ninety="true" />
+			<Card id="16" player_id="4" size_id="0" left_top_corner_x="85" left_top_corner_y="49" turn_ninety="true" /> 
 		</CardsPosition>
 	</ARBangTableSettings>
 	<ARBangGameSettings>

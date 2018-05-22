@@ -5,21 +5,38 @@ namespace IDAP
 {
 	void ImageDetectionAccessPoint::LoadCardData(uint16_t& errorCode, std::string path)
 	{
-
+        bool init = true;
+        bool sizeKnown = false;
+        cv::Size ss;
+        cv::Mat meanAcc;
         // name convertor
 		std::stringstream convertStream;
 		// list all files in given folder and load them to memory and provide them to card area detection for template matching
-		for (auto &file : std::experimental::filesystem::directory_iterator(path))
-		{
-			const cv::Mat img = cv::imread(file.path().string().c_str(), CV_LOAD_IMAGE_COLOR);
+		//for (auto &file : std::experimental::filesystem::directory_iterator(path))
+        for (const auto& cardDataName : cardDataNames)
+        {
+			//const cv::Mat img = cv::imread(file.path().string().c_str(), CV_LOAD_IMAGE_COLOR);
+            std::string pathName = path + "/" + cardDataName;
+            //std::cout << pathName << std::endl;
+            cv::Mat img = cv::imread(pathName.c_str(), CV_LOAD_IMAGE_COLOR);
+            if(img.data == NULL)
+            {
+                fprintf(stderr, "Image %s cannot be read.", pathName);
+                continue;
+            }
 			// subsample and save
-			const float ratio = static_cast<float>(img.rows) / static_cast<float>(img.cols);
-			const cv::Size ss(CARD_MATCHING_WIDTH, CARD_MATCHING_WIDTH*ratio);
+            if (!sizeKnown)
+            {
+                const float ratio = static_cast<float>(img.rows) / static_cast<float>(img.cols);
+                ss = cv::Size(CARD_MATCHING_WIDTH, CARD_MATCHING_WIDTH*ratio);
+                sizeKnown = true;
+            }
 			cv::Mat subImg;
 			cv::resize(img, subImg, ss);
 
 			int cardType = -1;
-			std::string name = file.path().string();
+			//std::string name = file.path().string();
+            std::string name = cardDataName;
 			const std::size_t indexE = name.find(".");
 			const std::size_t indexS = name.find_last_of("\\");
 			name = name.substr(indexS+1, indexE-indexS-1);
@@ -33,10 +50,45 @@ namespace IDAP
 
 			cardData.emplace_back(cardType, subImg);
 
+            // create gradient version
+            const int scale = 1;
+            const int delta = 0;
+            const int ddepth = CV_16S;
+            cv::Mat gray;
+            cv::Mat grad_x, grad_y;
+            cv::Mat abs_grad_x, abs_grad_y;
+            cv::Mat grad;
+
+            cv::cvtColor(subImg, gray, cv::COLOR_RGB2GRAY);
+            /// Gradient X
+            //Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
+            Sobel(gray, grad_x, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT);
+            convertScaleAbs(grad_x, abs_grad_x);
+
+            /// Gradient Y
+            //Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
+            Sobel(gray, grad_y, ddepth, 0, 1, 3, scale, delta, cv::BORDER_DEFAULT);
+            convertScaleAbs(grad_y, abs_grad_y);
+
+            /// Total Gradient (approximate)
+            cv::addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad);
+
+            cardDataGradient.emplace_back(cardType, grad);
+
+            if(init)
+            {
+                meanAcc = cv::Mat::zeros(grad.size(), CV_32F); //larger depth to avoid saturation
+                init = false;
+            }
+            cv::accumulate(grad, meanAcc);
+
 			// init for next
 			convertStream.clear();
 			convertStream.str(std::string());
 		}
+        // normalize mean
+        meanAcc = meanAcc / static_cast<float>(cardDataGradient.size());
+        meanAcc.convertTo(meanCardGrad, CV_8UC1);
 	}
 
 	// private function area ------------------------------------------------------------------
@@ -81,7 +133,8 @@ namespace IDAP
 															child->first_attribute("player_id")->value(), 
 															child->first_attribute("size_id")->value(),
 															child->first_attribute("left_top_corner_x")->value(),
-															child->first_attribute("left_top_corner_y")->value());
+															child->first_attribute("left_top_corner_y")->value(),
+                                                            child->first_attribute("turn_ninety")->value());
 			cardPositions.push_back(newPositionOfCard);
 		}
 
@@ -168,7 +221,7 @@ namespace IDAP
 			    CardSize* cSize = getCardSizeByID(cPos->getCardSizeID());
 			    CardAreaDetection* newDetector = new CardAreaDetection(cPos->getID(), cPos->getPlayerID(), cPos->getCardSizeID(),
 			                                                           cPos->getLeftTopX(), cPos->getLeftTopY(), cSize->getWidth(), cSize->getHeight(),
-                                                                       frame.cols, frame.rows, GetTableCalibration()->GetTableCalibrationResult()->mmInPixels);
+                                                                       frame.cols, frame.rows, GetTableCalibration()->GetTableCalibrationResult()->mmInPixels, cPos->isTurnenNinety());
 
 			    cardAreaDetectors.insert(std::pair<int, CardAreaDetection*>(cPos->getID(), newDetector));
             }
@@ -345,11 +398,15 @@ namespace IDAP
             {
                 cv::undistort(flippedFrame, frame, GetCameraCalibration()->GetCameraMatrix(), GetCameraCalibration()->GetDistanceCoeff());
             }
+            //cv::imwrite("tableCalibrationBefore.png", frame);
+
             // apply table calibration on frame if available
             if (GetTableCalibration()->IsCalibrationDone())
             {
                 GetTableCalibration()->ApplyTableCalibrationMatrixOnInput(frame);
             }
+
+            //cv::imwrite("tableCalibrationAfter.png", frame);
 
 			// sub sample frame for faster processing
 			cv::Size s100x100(100, 100);
@@ -409,7 +466,7 @@ namespace IDAP
 	 */
 	void ImageDetectionAccessPoint::IsCardChangedByID(uint16_t& errorCode, uint16_t&cardID, uint16_t& cardType)
 	{
-		cardAreaDetectors[cardID]->isCardChanged(errorCode, frame, GetCardData(), GetMeanCard(), cardType);
+		cardAreaDetectors[cardID]->isCardChanged(errorCode, frame, GetCardData(), GetCardDataGradient(), GetMeanCardGradient(), cardType);
 	}
 
 	uint16_t ImageDetectionAccessPoint::GetNumberOfCardAreas()
@@ -432,6 +489,8 @@ namespace IDAP
 			}
 			numOfDevices++;
 			deviceID++;
+            if (deviceID > 5)
+                break;
 		}
 	}
 
@@ -476,6 +535,8 @@ namespace IDAP
         initPlayerActiveAreaDetectors();
         // prepare card change detectors
         initCardAreaDetectors();
+        // load card data
+        LoadCardData(errorCode, GAME_CARD_PATH);
     }
 
     void ImageDetectionAccessPoint::InitImageDetectionAccessPointROS(uint16_t &errorCode, uchar *ipAdress, uint16_t &port, const char* &settingsPath)
@@ -501,7 +562,7 @@ namespace IDAP
 	}
 
 // ------- CARD POSITION ------------------------------------
-	CardPosition::CardPosition(char *_id, char* _playerID, char* _cardSizeID, char* _leftTop_x, char* _leftTop_y)
+	CardPosition::CardPosition(char *_id, char* _playerID, char* _cardSizeID, char* _leftTop_x, char* _leftTop_y, char* _turn_ninety)
 	{
 		// convert to int
 		std::stringstream ss;
@@ -523,6 +584,12 @@ namespace IDAP
 		ss.clear();
 		ss << _leftTop_y;
 		ss >> leftTop_y;
+
+        if (strcmp(_turn_ninety, "true") == 0)
+            turn_ninety = true;
+        else
+            turn_ninety = false;
+
 	}
 
 // ----------- PLAYER INFO ----------------------------------

@@ -1,11 +1,18 @@
 #include "ImageDetectionAccessPoint.h"
 #include "ImageDetectionAccessPointCaller.h"
 
-#include <opencv2\core\core.hpp>
-#include <opencv2\highgui\highgui.hpp>
-#include <opencv2\opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
 #include "CameraCalibration.h"
 #include "ImageDetectionAccessPointCaller.h"
+
+/***************************************************************
+* Author: Jiri Richter
+* The main.cpp contain testing sequecies, which were needed
+* during the developing of IDAP library. It is not supposed
+* to be run separately as self standing program.
+****************************************************************/
 
 #define TABLE_ID 0
 #define CAMERA_CALIBRATION_FILE "IDAP_CameraCalibCoeff_kinect2"
@@ -16,6 +23,81 @@
 int main() {
 	std::cout << "StartMain" << std::endl;
 
+    /*int scale = 1;
+    int delta = 0;
+    int ddepth = CV_16S;
+    // template matching example
+    cv::Mat rawImg = cv::imread("Bang_06.png", CV_LOAD_IMAGE_GRAYSCALE);
+    cv::Mat rawTempl = cv::imread("1.png", CV_LOAD_IMAGE_GRAYSCALE);
+
+    const float ratio = static_cast<float>(rawImg.size().width) / static_cast<float>(rawImg.size().height);   
+    cv::Mat temp;
+    const int newHeight = 60.f / ratio;
+    const cv::Size ss(60, newHeight);
+    cv::resize(rawTempl, temp, ss);
+
+    rawTempl = temp;
+
+    cv::Mat grad_x, grad_y, grad_x_templ, grad_y_templ;
+    cv::Mat abs_grad_x, abs_grad_y, abs_grad_x_templ, abs_grad_y_templ;
+    cv::Mat grad, gradTemple;
+
+    /// Gradient X
+    //Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
+    Sobel(rawImg, grad_x, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT);
+    convertScaleAbs(grad_x, abs_grad_x);
+
+    Sobel(rawTempl, grad_x_templ, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT);
+    convertScaleAbs(grad_x_templ, abs_grad_x_templ);
+
+    /// Gradient Y
+    //Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
+    Sobel(rawImg, grad_y, ddepth, 0, 1, 3, scale, delta, cv::BORDER_DEFAULT);
+    convertScaleAbs(grad_y, abs_grad_y);
+
+    Sobel(rawTempl, grad_y_templ, ddepth, 0, 1, 3, scale, delta, cv::BORDER_DEFAULT);
+    convertScaleAbs(grad_y_templ, abs_grad_y_templ);
+ 
+    /// Total Gradient (approximate)
+    cv::addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad);
+    cv::addWeighted(abs_grad_x_templ, 0.5, abs_grad_y_templ, 0.5, 0, gradTemple);
+
+    cv::Mat img_display, result;
+    rawImg.copyTo(img_display);
+    const int result_cols = rawImg.cols - rawTempl.cols + 1;
+    const int result_rows = rawImg.rows - rawTempl.rows + 1;
+
+
+    cv::imshow("img", grad);
+    cv::imshow("templ", gradTemple);
+
+    result.create(result_rows, result_cols, CV_32FC1);
+    cv::matchTemplate(rawImg, rawTempl, result, CV_TM_CCORR_NORMED);
+
+    double minVal; double maxVal;
+    cv::Point minLoc;
+    cv::Point maxLoc;
+    minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+    const cv::Point matchLoc = maxLoc;
+
+    /// Show me what you got
+    rectangle(img_display, matchLoc, cv::Point(matchLoc.x + rawTempl.cols, matchLoc.y + rawTempl.rows), cv::Scalar::all(0), 2, 8, 0);
+
+    cv::imshow("image_window", img_display);
+    cv::imshow("result_window", result);
+
+    cv::Mat result8;
+    result.convertTo(result8, CV_8UC1, 255.0);
+    cv::imshow("result", result8);
+
+    cv::imwrite("tmResultRaw.png", result8);
+    cv::imwrite("tmInputRaw.png", grad);
+    cv::imwrite("tmTemplRaw.png", gradTemple);
+
+    cv::waitKey(0);
+    exit(1);*/
+
+
 	IDAP::ImageDetectionAccessPoint *access = new IDAP::ImageDetectionAccessPoint();
 
 	uint16_t errorCode = 0;
@@ -23,8 +105,8 @@ int main() {
 	std::cout << "Size of 16 doubles: " << sizeof(double) * 16 << std::endl;
 	// get list of all cameras ----------- CAMERA SELECTION ------------------------------------------
 	{
-		uint16_t numOfAvailCam;
-		IDAP::ImageDetectionAccessPoint::GetNumberOfAllAvailableDevices(errorCode, numOfAvailCam);
+		uint16_t numOfAvailCam = 0;
+		//IDAP::ImageDetectionAccessPoint::GetNumberOfAllAvailableDevices(errorCode, numOfAvailCam);
         std::cout << "Avail devicss: " << numOfAvailCam << std::endl;
 		/*if (errorCode == IDAP::ImageDetectionAccessPoint::ErrorCodes::OK)
 		{
@@ -176,7 +258,7 @@ int main() {
 		{
 			tblCalib->InitTableCalibration();
 		}
-		cv::waitKey();
+		cv::waitKey(0);
 	}
 	cv::destroyWindow("CalibResult");
 
@@ -235,8 +317,8 @@ int main() {
     // ----------------------------------- LOAD DATA FOR DETECTION ---------------------
     access->InitImageDetectionAccessPointDataAndDetection(errorCode, TABLE_ID);
 
-	std::cout << "Loading Game Card Data" << std::endl;
-    access->LoadCardData(errorCode, GAME_CARD_PATH);
+	//std::cout << "Loading Game Card Data" << std::endl;
+    //access->LoadCardData(errorCode, GAME_CARD_PATH);
 
 	if (errorCode != 0)
 	{
@@ -257,14 +339,17 @@ int main() {
     uint16_t cardID = 0;
     cv::namedWindow("Current");
 
+    //IDAP::CardAreaDetection* testerCardArea = new IDAP::CardAreaDetection(0, 0, 0, 0, 0, 0, 0, 0, 0, 0.f, false);
+    //testerCardArea->CardDetectionTester(access->GetCardData());
+
 	while (true)
 	{
-		char pressed = cv::waitKey(40);
+		char pressed = cv::waitKey(20);
 		// get next frame from camera
 		access->PrepareNextFrame(errorCode);
 		cv::imshow("Current", access->getSubSampledFrame());
 		// for all players, check if area is active
-		double isActive;
+		double isActive = 0;
         bool active = false;
 		for (uint16_t i = 1; i < access->GetNumberOfPlayers() + 1; ++i)
 		{
@@ -278,21 +363,19 @@ int main() {
         if(active)
             std::cout << "----------------\n";
 		// TO-DO: CHECK IF CARD HAS CHANGED
-		uint16_t cardID = 0;
+		uint16_t cardID = 1;
         uint16_t cardType = 0;
 		
 	    access->IsCardChangedByID(errorCode, cardID, cardType);
 
         if(cardType != 0)
         {
-            std::cout << "Some card was detected." << std::endl;
+            std::cout << "Some card was detected. Card type: " << cardType << std::endl;
         }
 
 		// exit on q pressed
 		if (pressed == 'q')
 			break;
-
-        cv::waitKey(40);
 	}
 
 	// free memory

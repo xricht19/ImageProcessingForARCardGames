@@ -47,16 +47,18 @@ namespace IDAP
 		int cardSizeID;
 		int leftTop_x;
 		int leftTop_y;
+        bool turn_ninety;
 
 	public:
-		CardPosition(char *_id, char* _playerID, char* _cardSizeID, char* _leftTop_x, char* _leftTop_y);
-		~CardPosition() {}
+		CardPosition(char *_id, char* _playerID, char* _cardSizeID, char* _leftTop_x, char* _leftTop_y, char* _turn_ninety);
+        ~CardPosition() = default;
 
 		int getID() { return id; }
 		int getPlayerID() { return playerID; }
 		int getCardSizeID() { return cardSizeID; }
 		int getLeftTopX() { return leftTop_x; }
 		int getLeftTopY() { return leftTop_y; }
+        bool isTurnenNinety() { return turn_ninety; }
 	};
 
 
@@ -85,12 +87,11 @@ namespace IDAP
 	class ImageDetectionAccessPoint
 	{
 	private:
-        inline static std::string cardDataNames[31] = 
+        inline static std::string cardDataNames[28] = 
         {
             "1.png", "2.png", "3.png", "4.png", "5.png", "6.png", "7.png", "8.png", "9.png", "10.png",
             "11.png", "12.png", "13.png", "14.png", "15.png", "16.png", "17.png", "18.png", "19.png", "20.png",
-            "21.png", "22.png", "23.png", "24.png", "25.png", "26.png", "27.png", "28.png", "29.png", "30.png",
-            "31.png",
+            "21.png", "22.png", "23.png", "24.png", "25.png", "26.png", "27.png", "28.png",
         };
 
 		cv::VideoCapture openedStream;
@@ -112,7 +113,8 @@ namespace IDAP
 
 		// card data for template matching
 		std::vector<std::pair<int, cv::Mat>> cardData;
-        cv::Mat meanCard;
+        std::vector<std::pair<int, cv::Mat>> cardDataGradient;
+        cv::Mat meanCardGrad;
 
 		// additional function to load settings from xml
 		void loadSettingsFromXml(const char*, int);
@@ -168,7 +170,8 @@ namespace IDAP
 		uint16_t GetNumberOfCardAreas();
 		uint16_t GetNumberOfPlayers();
 		std::vector<std::pair<int, cv::Mat>>& GetCardData() { return cardData; }
-        cv::Mat& GetMeanCard() { return meanCard; }
+        std::vector<std::pair<int, cv::Mat>>& GetCardDataGradient() { return cardDataGradient; }
+        cv::Mat& GetMeanCardGradient() { return meanCardGrad; }
 
 		int errorCode;
 

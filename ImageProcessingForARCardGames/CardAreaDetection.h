@@ -12,14 +12,15 @@
 
 #include "ImageDetectionAccessPoint.h"
 
-#define CONTOUR_TO_ROI_TO_IS_CARD 0.5
+#define MIN_MEAN_VALUE 20.0 // to override to high score of template matching mean card with empty space
+#define TEMPLATE_MATCH_SCORE_MIN 0.7
+#define MAX_LINE_ANGLE_FOR_HOUGH 90
 
 namespace IDAP
 {
     static enum BangCardTypes
     {
         NONE = 0,
-        BANG_A,
     };
 
 
@@ -64,10 +65,10 @@ namespace IDAP
 	class CardAreaDetection
 	{
 	public:
-		CardAreaDetection(int _id, int _playerID, int _sizeID, int _xPos, int _yPos, int _width, int _height, int imageWidth, int imageHeight, float mmInPixel);
+		CardAreaDetection(int _id, int _playerID, int _sizeID, int _xPos, int _yPos, int _width, int _height, int imageWidth, int imageHeight, float mmInPixel, bool turn);
 		~CardAreaDetection();
 
-		void isCardChanged(uint16_t& errorCode, cv::Mat currentFrame, std::vector<std::pair<int, cv::Mat>>& cardDataReference, cv::Mat meanCard, uint16_t& cardType) const; // core function with template matching function
+		void isCardChanged(uint16_t& errorCode, cv::Mat currentFrame, std::vector<std::pair<int, cv::Mat>>& cardDataReference, std::vector<std::pair<int, cv::Mat>>& cardDataGradientReference, cv::Mat meanCardGrad, uint16_t& cardType) const; // core function with template matching function
 
         void CardDetectionTester(std::vector<std::pair<int, cv::Mat>> cardDataReference);
 
@@ -86,6 +87,10 @@ namespace IDAP
 
 		int cardID;
 		bool initState;
+
+        bool turned;
+        cv::Mat rot;
+        cv::Size sizeTM;
 
 	    // avarage pixel value for background
         float backGroundMean;
